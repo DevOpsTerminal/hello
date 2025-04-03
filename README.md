@@ -11,7 +11,7 @@ Skrypt do wyszukiwania zainstalowanego oprogramowania i usług na systemach Linu
 Projekt został podzielony na wiele plików dla łatwiejszej modyfikacji i rozszerzalności:
 
 ```
-linux_software_finder/
+hello/
 ├── src/
 │   ├── functions/        # Katalog zawierający pliki z poszczególnymi funkcjami
 │   │   ├── command_exists.sh
@@ -22,7 +22,7 @@ linux_software_finder/
 │       ├── colors.sh     # Konfiguracja kolorów
 │       ├── defaults.sh   # Domyślne wartości zmiennych
 │       └── main.sh       # Główna funkcja programu
-├── linux_software_finder.sh  # Finalny skrypt (wygenerowany)
+├── hello.sh  # Finalny skrypt (wygenerowany)
 ├── create_structure.sh       # Skrypt tworzący strukturę folderów
 └── merge_files.sh           # Skrypt łączący pliki w jeden skrypt wykonawczy
 ```
@@ -33,19 +33,19 @@ linux_software_finder/
 
 1. Utwórz strukturę katalogów używając `create_structure.sh`:
    ```
-   ./create_structure.sh
+   ./scripts/structure.sh
    ```
 
 2. Modyfikuj poszczególne pliki z funkcjami w katalogu `src/functions/` lub pliki konfiguracyjne w `src/main/`.
 
 3. Po zakończeniu modyfikacji, użyj skryptu `merge_files.sh` aby połączyć wszystkie pliki w jeden wykonawczy skrypt:
    ```
-   ./merge_files.sh
+   ./scripts/merge.sh
    ```
 
-4. Wygenerowany skrypt `linux_software_finder.sh` jest gotowy do uruchomienia:
+4. Wygenerowany skrypt `hello.sh` jest gotowy do uruchomienia:
    ```
-   ./linux_software_finder.sh
+   ./hello.sh
    ```
 
 ### Używanie finalnego skryptu
@@ -53,7 +53,7 @@ linux_software_finder/
 Uruchom skrypt jako użytkownik root, aby uzyskać pełny dostęp do informacji o systemie:
 
 ```
-sudo ./linux_software_finder.sh
+sudo ./hello.sh
 ```
 
 Po uruchomieniu skryptu zostanie wyświetlone menu główne z różnymi opcjami:
@@ -298,7 +298,7 @@ Jesteśmy otwarci na współpracę! Jeśli chcesz przyczynić się do rozwoju pr
 Poniżej znajduje się lista wszystkich plików w projekcie Linux Software Finder:
 
 ### Pliki główne:
-1. `linux_software_finder.sh` - finalny skrypt (wygenerowany)
+1. `hello.sh` - finalny skrypt (wygenerowany)
 2. `create_structure.sh` - skrypt tworzący strukturę folderów
 3. `merge_files.sh` - skrypt łączący pliki w jeden skrypt wykonawczy
 4. `README.md` - dokumentacja projektu
