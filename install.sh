@@ -111,7 +111,7 @@ download_and_verify() {
 
     # Uruchom skrypt z opcją help
     echo "Uruchamianie skryptu z opcją help..." >&2
-    hello help
+    hello --help
 }
 
 # Główna logika
