@@ -58,46 +58,68 @@ Skrypt automatycznie wykrywa menedżer pakietów i dostosowuje swoje działanie 
 
 ---
 
-## Instalacja
-
-![install.png](img/install.png)
-
-### Wymagania systemowe
-
-- System operacyjny Linux (dowolna wspierana dystrybucja)
-- Bash w wersji 4.0 lub nowszej
-- Standardowe narzędzia wiersza poleceń (find, grep, awk, sed)
-- Uprawnienia administratora (root) dla pełnej funkcjonalności
-
 ### Metody instalacji
 
-#### Pobranie za pomocą wget
+
+#### Wymagania
+- `curl`
+- `bash`
+- `sha256sum`
+
+
+#### Bezpieczna instalacja z weryfikacją sumy kontrolnej
 
 ```bash
+# Metoda 1: Bezpośrednie pobranie i wykonanie
+wget -O install.sh https://raw.githubusercontent.com/DevOpsTerminal/hello/main/install.sh && bash install.sh
+
+# Metoda 2: Alternatywne źródło
+curl -sSL https://hello.devopsterminal.com/install.sh | bash
+```
+
+#### Ręczne pobieranie i weryfikacja
+
+```bash
+# Pobierz skrypt
 wget https://raw.githubusercontent.com/DevOpsTerminal/hello/main/hello.sh
-wget https://hello.devopsterminal.com/hello.sh
 
+# Pobierz sumę kontrolną
+wget https://raw.githubusercontent.com/DevOpsTerminal/hello/main/checksums.sha256
+
+# Zweryfikuj sumę kontrolną
+sha256sum -c checksums.sha256
 ```
 
-#### Pobranie za pomocą curl
+#### Bezpośrednie pobranie i uruchomienie
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/DevOpsTerminal/hello/main/hello.sh | bash
-curl -sSL https://hello.devopsterminal.com/hello.sh -o hello.sh
-```
+# Za pomocą curl
+curl -sSL https://raw.githubusercontent.com/DevOpsTerminal/hello/main/hello.sh -o hello.sh
 
-#### Uruchomienie
-
-```bash
-# Przejrzyj zawartość skryptu
-cat hello.sh
+# Za pomocą wget
+wget https://raw.githubusercontent.com/DevOpsTerminal/hello/main/hello.sh
 
 # Nadaj uprawnienia wykonania
 chmod +x hello.sh
 
-# Uruchomienie skryptu
+# Uruchom skrypt
 ./hello.sh
 ```
+
+
+## Support
+
+- Upewnij się, że posiadasz wymagane narzędzia (`curl`, `bash`, `sha256sum`)
+- Sprawdź połączenie internetowe
+- Zweryfikuj sumę kontrolną przed uruchomieniem skryptu
+
+- **Suma kontrolna**: Każde pobranie jest weryfikowane za pomocą SHA256
+- **Źródła**: Oficjalne repozytorium GitHub i domena DevOps Terminal
+- **Uprawnienia**: Możliwość uruchomienia bez uprawnień roota
+
+## Wsparcie
+
+W razie problemów skontaktuj się z administratorem lub otwórz zgłoszenie w repozytorium GitHub.
 
 
 
