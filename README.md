@@ -61,6 +61,7 @@ Skrypt automatycznie wykrywa menedżer pakietów i dostosowuje swoje działanie 
 ## Instalacja
 
 ![install.png](img/install.png)
+
 ### Wymagania systemowe
 
 - System operacyjny Linux (dowolna wspierana dystrybucja)
@@ -70,28 +71,35 @@ Skrypt automatycznie wykrywa menedżer pakietów i dostosowuje swoje działanie 
 
 ### Metody instalacji
 
-#### Instalacja za pomocą curl
+#### Pobranie za pomocą wget
 
 ```bash
-# Instalacja bezpośrednio z oficjalnej strony
-curl -sSL https://hello.devopsterminal.com/hello.sh | bash
+wget https://raw.githubusercontent.com/DevOpsTerminal/hello/main/hello.sh
+wget https://hello.devopsterminal.com/hello.sh
 
-# Alternatywnie, instalacja z GitHub
-curl -sSL https://raw.githubusercontent.com/DevOpsTerminal/hello/main/hello.sh | bash
 ```
 
-#### Ręczna instalacja
+#### Pobranie za pomocą curl
 
 ```bash
-# Pobranie skryptu
-curl -sSL https://github.com/DevOpsTerminal/hello/raw/main/hello.sh -o hello.sh
+curl -sSL https://raw.githubusercontent.com/DevOpsTerminal/hello/main/hello.sh | bash
+curl -sSL https://hello.devopsterminal.com/hello.sh -o hello.sh
+```
 
-# Nadanie uprawnień wykonywania
+#### Uruchomienie
+
+```bash
+# Przejrzyj zawartość skryptu
+cat hello.sh
+
+# Nadaj uprawnienia wykonania
 chmod +x hello.sh
 
 # Uruchomienie skryptu
 ./hello.sh
 ```
+
+
 
 #### Instalacja dla użytkowników bez uprawnień roota
 
