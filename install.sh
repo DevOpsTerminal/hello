@@ -3,10 +3,7 @@
 # Konfiguracja źródeł
 PROJECT_BASE_URL="https://raw.githubusercontent.com/DevOpsTerminal/hello/main"
 SCRIPT_NAME="hello.sh"
-CHECKSUM_NAME="checksums.sha256"
-
-# Alternatywne źródło (opcjonalne)
-ALTERNATIVE_BASE_URL="https://hello.devopsterminal.com"
+CHECKSUM_FILE="checksums/checksums.sha256"
 
 # Funkcje logowania z kolorami
 log_error() {
@@ -24,8 +21,8 @@ log_info() {
 # Funkcja pobierająca sumę kontrolną
 fetch_checksum() {
     local urls=(
-        "${PROJECT_BASE_URL}/${CHECKSUM_NAME}"
-        "${ALTERNATIVE_BASE_URL}/${CHECKSUM_NAME}"
+        "${PROJECT_BASE_URL}/${CHECKSUM_FILE}"
+        "https://hello.devopsterminal.com/${CHECKSUM_FILE}"
     )
 
     for url in "${urls[@]}"; do
@@ -45,7 +42,7 @@ fetch_checksum() {
 fetch_script() {
     local urls=(
         "${PROJECT_BASE_URL}/${SCRIPT_NAME}"
-        "${ALTERNATIVE_BASE_URL}/${SCRIPT_NAME}"
+        "https://hello.devopsterminal.com/${SCRIPT_NAME}"
     )
 
     for url in "${urls[@]}"; do
