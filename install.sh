@@ -5,32 +5,8 @@ PROJECT_BASE_URL="https://raw.githubusercontent.com/DevOpsTerminal/hello/main"
 SCRIPT_NAME="hello.sh"
 CHECKSUM_FILE="checksums/checksums.sha256"
 
-# Domyślna ścieżka instalacji
-INSTALL_DIR="/usr/local/bin"
-COMMAND_NAME="hello"
-
-# Funkcje logowania z kolorami
-log_error() {
-    echo -e "\e[31m[BŁĄD]\e[0m $1" >&2
-}
-
-log_success() {
-    echo -e "\e[32m[SUKCES]\e[0m $1" >&2
-}
-
-log_info() {
-    echo -e "\e[34m[INFO]\e[0m $1" >&2
-}
-
-# Funkcja sprawdzająca uprawnienia roota
-check_root() {
-    if [[ $EUID -ne 0 ]]; then
-        log_error "Ten skrypt wymaga uprawnień administratora (root)."
-        log_error "Użyj 'sudo' przed poleceniem."
-        return 1
-    fi
-    return 0
-}
+# Domyślna ścieżka instalacji użytkownika
+USER_BIN_DIR="$HOME/.local/bin"
 
 # Funkcja pobierająca sumę kontrolną
 fetch_checksum() {
@@ -40,7 +16,7 @@ fetch_checksum() {
     )
 
     for url in "${urls[@]}"; do
-        log_info "Próba pobrania sumy kontrolnej z: $url"
+        echo "Próba pobrania sumy kontrolnej z: $url" >&2
         local output=$(curl -sSL "$url" 2>/dev/null)
         local checksum=$(echo "$output" | grep -E "hello\.sh\s*$" | awk '{print $1}')
 
@@ -50,7 +26,7 @@ fetch_checksum() {
         fi
     done
 
-    log_error "Nie znaleziono sumy kontrolnej"
+    echo "Nie znaleziono sumy kontrolnej" >&2
     return 1
 }
 
@@ -62,81 +38,97 @@ fetch_script() {
     )
 
     for url in "${urls[@]}"; do
-        log_info "Próba pobrania skryptu z: $url"
+        echo "Próba pobrania skryptu z: $url" >&2
         if curl -sSL "$url" -o "${SCRIPT_NAME}" 2>/dev/null; then
             return 0
         fi
     done
 
-    log_error "Nie udało się pobrać skryptu"
+    echo "Nie udało się pobrać skryptu" >&2
     return 1
 }
 
-# Główna funkcja instalacji
-install_command() {
-    # Sprawdź sumę kontrolną
+# Funkcja przygotowująca środowisko użytkownika
+prepare_user_environment() {
+    # Stwórz katalog .local/bin jeśli nie istnieje
+    mkdir -p "$USER_BIN_DIR"
+
+    # Dodaj .local/bin do PATH jeśli nie jest już dodany
+    if [[ ":$PATH:" != *":$USER_BIN_DIR:"* ]]; then
+        echo "Dodawanie $USER_BIN_DIR do PATH" >&2
+
+        # Wybierz odpowiedni plik konfiguracyjny powłoki
+        if [ -f "$HOME/.bashrc" ]; then
+            echo "export PATH=\"$USER_BIN_DIR:\$PATH\"" >> "$HOME/.bashrc"
+        elif [ -f "$HOME/.zshrc" ]; then
+            echo "export PATH=\"$USER_BIN_DIR:\$PATH\"" >> "$HOME/.zshrc"
+        fi
+    fi
+}
+
+# Główna funkcja weryfikacji
+download_and_verify() {
+    # Przygotuj środowisko użytkownika
+    prepare_user_environment
+
+    # Pobierz sumę kontrolną
     local remote_checksum=$(fetch_checksum)
     if [ $? -ne 0 ]; then
-        log_error "Błąd pobierania sumy kontrolnej"
+        echo "Błąd pobierania sumy kontrolnej" >&2
         return 1
     fi
 
     # Usuń białe znaki z sumy kontrolnej
     remote_checksum=$(echo "$remote_checksum" | tr -d '[:space:]')
-    log_info "Pobrana suma kontrolna: $remote_checksum"
 
     # Pobierz skrypt
     if ! fetch_script; then
-        log_error "Błąd pobierania skryptu"
+        echo "Błąd pobierania skryptu" >&2
         return 1
     fi
 
     # Sprawdź sumę kontrolną
-    log_info "Weryfikacja sumy kontrolnej..."
+    echo "Weryfikacja sumy kontrolnej..." >&2
     local local_checksum=$(sha256sum "${SCRIPT_NAME}" | awk '{print $1}')
 
-    log_info "Suma kontrolna zdalna:  $remote_checksum"
-    log_info "Suma kontrolna lokalna: $local_checksum"
+    echo "Suma kontrolna zdalna:  $remote_checksum" >&2
+    echo "Suma kontrolna lokalna: $local_checksum" >&2
 
     # Porównaj sumy kontrolne
     if [ "$remote_checksum" != "$local_checksum" ]; then
-        log_error "Suma kontrolna nie zgadza się!"
+        echo "BŁĄD: Suma kontrolna nie zgadza się!" >&2
         return 1
     fi
 
-    # Skopiuj skrypt do globalnej lokalizacji i zmień nazwę
-    cp "${SCRIPT_NAME}" "${INSTALL_DIR}/${COMMAND_NAME}"
-    chmod +x "${INSTALL_DIR}/${COMMAND_NAME}"
+    # Skopiuj skrypt do katalogu użytkownika
+    cp "${SCRIPT_NAME}" "${USER_BIN_DIR}/hello"
+    chmod +x "${USER_BIN_DIR}/hello"
 
     # Usuń tymczasowy plik
     rm "${SCRIPT_NAME}"
 
-    log_success "Komenda 'hello' została zainstalowana w ${INSTALL_DIR}/${COMMAND_NAME}"
-
-    # Wyświetl help
-    log_info "Wyświetlanie informacji pomocy:"
-    "${INSTALL_DIR}/${COMMAND_NAME}" help
+    # Uruchom skrypt z opcją help
+    echo "Uruchamianie skryptu z opcją help..." >&2
+    hello help
 }
 
 # Główna logika
 main() {
-    # Sprawdź uprawnienia roota
-    check_root || return 1
-
     # Sprawdź wymagane narzędzia
     for tool in curl sha256sum; do
         if ! command -v "$tool" &> /dev/null; then
-            log_error "Wymagane narzędzie $tool nie jest zainstalowane!"
+            echo "Wymagane narzędzie $tool nie jest zainstalowane!" >&2
             return 1
         fi
     done
 
-    # Wykonaj instalację
-    if install_command; then
-        log_success "Instalacja zakończona sukcesem!"
+    # Wykonaj pobieranie, weryfikację i uruchomienie z help
+    if download_and_verify; then
+        echo "Instalacja i weryfikacja zakończone sukcesem!" >&2
+        echo "Otwórz nowy terminal lub uruchom 'source ~/.bashrc' / 'source ~/.zshrc'" >&2
         return 0
     else
-        log_error "Instalacja nie powiodła się!"
+        echo "Instalacja nie powiodła się!" >&2
         return 1
     fi
 }
