@@ -69,15 +69,17 @@ Skrypt automatycznie wykrywa menedżer pakietów i dostosowuje swoje działanie 
 
 #### Bezpieczna instalacja z weryfikacją sumy kontrolnej
 
-```bash
-# Metoda 1: Bezpośrednie pobranie i wykonanie
+##### Bezpośrednie pobranie i wykonanie z repozytorium github
+```bash 
 wget -O install.sh https://raw.githubusercontent.com/DevOpsTerminal/hello/main/install.sh && bash install.sh
+```
 
-# Metoda 2: Alternatywne źródło
+##### Bezpośrednie pobranie z domeny DevOps Terminal
+```bash
 curl -sSL https://hello.devopsterminal.com/install.sh | bash
 ```
 
-#### Ręczne pobieranie i weryfikacja
+##### Ręczne pobieranie i weryfikacja
 
 ```bash
 # Pobierz skrypt
