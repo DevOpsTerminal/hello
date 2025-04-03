@@ -11,7 +11,7 @@ OUTPUT_FILE="hello.sh"
 cat > "$OUTPUT_FILE" << 'EOF'
 #!/bin/bash
 
-# Linux Software Finder
+# hello .sh - Linux Software Finder
 # Skrypt do wyszukiwania zainstalowanego oprogramowania i usług na systemach Linux
 # Działa na różnych dystrybucjach (Ubuntu, Debian, Fedora, itp.)
 # Umożliwia śledzenie zmian w systemie od określonej daty

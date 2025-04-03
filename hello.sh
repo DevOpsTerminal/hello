@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Linux Software Finder
+# hello .sh - Linux Software Finder
 # Skrypt do wyszukiwania zainstalowanego oprogramowania i usług na systemach Linux
 # Działa na różnych dystrybucjach (Ubuntu, Debian, Fedora, itp.)
 # Umożliwia śledzenie zmian w systemie od określonej daty
@@ -1309,7 +1309,7 @@ main() {
                 shift
                 ;;
             --version)
-                echo -e "${GREEN}Linux Software Finder v1.0${RESET}"
+                echo -e "${GREEN}hello .sh - Linux Software Finder v1.0${RESET}"
                 echo -e "${CYAN}Copyright (c) 2023 DevOpsTerminal${RESET}"
                 shift
                 ;;
@@ -1349,7 +1349,7 @@ main() {
 # Funkcja pomocy - szczegółowy opis dostępnych opcji
 display_help() {
     echo -e "${BLUE}===========================================================${RESET}"
-    echo -e "${GREEN}Linux Software Finder - narzędzie do analizy systemu Linux${RESET}"
+    echo -e "${GREEN}hello .sh - Linux Software Finder - narzędzie do analizy systemu${RESET}"
     echo -e "${BLUE}===========================================================${RESET}"
     echo -e "${YELLOW}Wersja 1.0${RESET}"
     echo -e "Ten skrypt identyfikuje zainstalowane oprogramowanie i usługi w systemie Linux oraz umożliwia śledzenie zmian od określonej daty."
@@ -1413,4 +1413,4 @@ display_help() {
 
 # Uruchom program
 main "$@"
-# Thu Apr  3 12:54:16 PM CEST 2025
+# Thu Apr  3 12:59:12 PM CEST 2025

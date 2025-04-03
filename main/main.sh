@@ -113,7 +113,7 @@ main() {
                 shift
                 ;;
             --version)
-                echo -e "${GREEN}Linux Software Finder v1.0${RESET}"
+                echo -e "${GREEN}hello .sh - Linux Software Finder v1.0${RESET}"
                 echo -e "${CYAN}Copyright (c) 2023 DevOpsTerminal${RESET}"
                 shift
                 ;;
@@ -153,7 +153,7 @@ main() {
 # Funkcja pomocy - szczegółowy opis dostępnych opcji
 display_help() {
     echo -e "${BLUE}===========================================================${RESET}"
-    echo -e "${GREEN}Linux Software Finder - narzędzie do analizy systemu Linux${RESET}"
+    echo -e "${GREEN}hello .sh - Linux Software Finder - narzędzie do analizy systemu${RESET}"
     echo -e "${BLUE}===========================================================${RESET}"
     echo -e "${YELLOW}Wersja 1.0${RESET}"
     echo -e "Ten skrypt identyfikuje zainstalowane oprogramowanie i usługi w systemie Linux oraz umożliwia śledzenie zmian od określonej daty."

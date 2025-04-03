@@ -1,14 +1,115 @@
-# DevOpsTerminal - Hello System Scanner
+# Hello System Scanner - Kompletna dokumentacja
 
 ![DevOpsTerminal Logo](https://github.com/DevOpsTerminal/hello/raw/main/assets/logo.png)
 
-# Linux Software Finder
+**Wersja: 1.2.0**
 
-Skrypt do wyszukiwania zainstalowanego oprogramowania i usług na systemach Linux. Działa na różnych dystrybucjach (Ubuntu, Debian, Fedora, itp.) i umożliwia śledzenie zmian w systemie od określonej daty.
+---
 
-## Struktura projektu
+## Spis treści
 
-Projekt został podzielony na wiele plików dla łatwiejszej modyfikacji i rozszerzalności:
+1. [Wprowadzenie](#wprowadzenie)
+2. [Instalacja](#instalacja)
+3. [Architektura projektu](#architektura-projektu)
+4. [Sposób użycia](#sposób-użycia)
+   - [Opcje wiersza poleceń](#opcje-wiersza-poleceń)
+   - [Przykłady użycia](#przykłady-użycia)
+5. [Funkcje szczegółowe](#funkcje-szczegółowe)
+   - [Informacje o systemie](#informacje-o-systemie)
+   - [Zarządzanie pakietami](#zarządzanie-pakietami)
+   - [Usługi i procesy](#usługi-i-procesy)
+   - [Analiza sieci](#analiza-sieci)
+   - [Śledzenie zmian w systemie](#śledzenie-zmian-w-systemie)
+   - [Raporty miesięczne](#raporty-miesięczne)
+6. [Wyniki i wizualizacje](#wyniki-i-wizualizacje)
+7. [Rozwijanie projektu](#rozwijanie-projektu)
+8. [Rozwiązywanie problemów](#rozwiązywanie-problemów)
+9. [Często zadawane pytania (FAQ)](#często-zadawane-pytania-faq)
+10. [Porównanie wersji](#porównanie-wersji)
+11. [Licencja i prawa autorskie](#licencja-i-prawa-autorskie)
+12. [Kontakt i wsparcie](#kontakt-i-wsparcie)
+
+---
+
+## Wprowadzenie
+
+**Hello System Scanner** to zaawansowane narzędzie diagnostyczne dla systemów Linux, zaprojektowane przez zespół DevOpsTerminal. Skrypt umożliwia administratorom systemów oraz specjalistom DevOps kompleksową analizę i monitorowanie zmian w systemie Linux.
+
+### Główne możliwości
+
+- Identyfikacja zainstalowanego oprogramowania i usług
+- Wykrywanie otwartych portów i usług nasłuchujących
+- Analiza konfiguracji sieci
+- Śledzenie zmian w systemie od określonej daty
+- Generowanie raportów miesięcznych z wizualizacjami
+- Monitorowanie zmian w plikach konfiguracyjnych
+- Analiza zmian dotyczących użytkowników i uprawnień
+
+### Wspierane dystrybucje
+
+Hello System Scanner jest kompatybilny z większością popularnych dystrybucji Linux, w tym:
+- Ubuntu/Debian
+- Fedora/RHEL/CentOS
+- Arch Linux
+- openSUSE
+- oraz inne dystrybucje oparte na tych systemach
+
+Skrypt automatycznie wykrywa menedżer pakietów i dostosowuje swoje działanie do konkretnej dystrybucji.
+
+---
+
+## Instalacja
+
+### Wymagania systemowe
+
+- System operacyjny Linux (dowolna wspierana dystrybucja)
+- Bash w wersji 4.0 lub nowszej
+- Standardowe narzędzia wiersza poleceń (find, grep, awk, sed)
+- Uprawnienia administratora (root) dla pełnej funkcjonalności
+
+### Metody instalacji
+
+#### Instalacja za pomocą curl
+
+```bash
+# Instalacja bezpośrednio z oficjalnej strony
+curl -sSL https://hello.devopsterminal.com/hello.sh | bash
+
+# Alternatywnie, instalacja z GitHub
+curl -sSL https://raw.githubusercontent.com/DevOpsTerminal/hello/main/hello.sh | bash
+```
+
+#### Ręczna instalacja
+
+```bash
+# Pobranie skryptu
+curl -sSL https://github.com/DevOpsTerminal/hello/raw/main/hello.sh -o hello.sh
+
+# Nadanie uprawnień wykonywania
+chmod +x hello.sh
+
+# Uruchomienie skryptu
+./hello.sh
+```
+
+#### Instalacja dla użytkowników bez uprawnień roota
+
+Skrypt może być uruchomiony bez uprawnień administratora, jednak pewne funkcje będą ograniczone:
+
+```bash
+./hello.sh
+```
+
+Po uruchomieniu pojawi się ostrzeżenie:
+```
+Uwaga: Skrypt nie jest uruchomiony jako root. Niektóre informacje mogą być niedostępne.
+```
+
+---
+
+## Architektura projektu
+
+Hello System Scanner został zaprojektowany z myślą o modułowości i łatwości rozszerzania. Struktura projektu wygląda następująco:
 
 ```
 hello/
@@ -17,176 +118,335 @@ hello/
 │   │   ├── command_exists.sh
 │   │   ├── date_timestamp.sh
 │   │   ├── detect_distro.sh
-│   │   └── ...
+│   │   └── ... (pozostałe funkcje)
 │   ├── main/             # Katalog z głównymi plikami programu
 │       ├── colors.sh     # Konfiguracja kolorów
 │       ├── defaults.sh   # Domyślne wartości zmiennych
 │       └── main.sh       # Główna funkcja programu
-├── hello.sh  # Finalny skrypt (wygenerowany)
-├── create_structure.sh       # Skrypt tworzący strukturę folderów
-└── merge_files.sh           # Skrypt łączący pliki w jeden skrypt wykonawczy
+├── hello.sh              # Finalny skrypt (wygenerowany)
+├── create_structure.sh   # Skrypt tworzący strukturę folderów
+└── merge_files.sh        # Skrypt łączący pliki w jeden skrypt wykonawczy
 ```
 
-## Jak korzystać
+### Opis głównych komponentów
 
-### Rozwój i modyfikacja
+#### Katalog `src/functions/`
 
+Zawiera zestaw wyspecjalizowanych funkcji, każda w oddzielnym pliku:
 
-Modyfikuj poszczególne pliki z funkcjami w katalogu `src/functions/` lub pliki konfiguracyjne w `src/main/`.
+1. `print_header.sh` - funkcja wyświetlająca nagłówki
+2. `command_exists.sh` - sprawdzanie dostępności polecenia
+3. `date_timestamp.sh` - funkcje obsługi dat i czasów
+4. `detect_distro.sh` - wykrywanie dystrybucji Linux
+5. `get_system_info.sh` - pobieranie informacji o systemie
+6. `get_installed_packages.sh` - pobieranie listy zainstalowanych pakietów
+7. `get_running_services.sh` - pobieranie listy uruchomionych usług
+8. `check_open_ports.sh` - sprawdzanie otwartych portów
+9. `check_startup_programs.sh` - sprawdzanie programów startowych
+10. `check_config_changes.sh` - sprawdzanie zmian w plikach konfiguracyjnych
+11. `find_recent_packages.sh` - znajdowanie ostatnio zainstalowanych pakietów
+12. `check_repositories.sh` - sprawdzanie repozytoriów
+13. `track_user_changes.sh` - śledzenie zmian w użytkownikach i grupach
+14. `track_binary_changes.sh` - śledzenie zmian w plikach binarnych
+15. `track_scheduled_tasks.sh` - śledzenie zmian w zadaniach cron
+16. `check_network_changes.sh` - sprawdzanie zmian w konfiguracji sieci
+17. `check_system_timestamps.sh` - sprawdzanie czasów modyfikacji plików systemowych
+18. `visualize_monthly_changes.sh` - wizualizacja zmian miesięcznych
+19. `generate_monthly_stats.sh` - generowanie statystyk miesięcznych
+20. `generate_monthly_reports.sh` - generowanie raportów miesięcznych
+21. `save_results.sh` - zapisywanie wyników do pliku
+22. `set_tracking_date.sh` - ustawianie daty śledzenia zmian
 
-Po zakończeniu modyfikacji, użyj skryptu `merge_files.sh` aby połączyć wszystkie pliki w jeden wykonawczy skrypt:
-   ```
-   ./scripts/merge.sh
-   ```
+#### Katalog `src/main/`
 
-Wygenerowany skrypt `hello.sh` jest gotowy do uruchomienia:
-   ```
-   ./hello.sh
-   ```
+Zawiera pliki konfiguracyjne i główne funkcje programu:
 
-### Używanie finalnego skryptu
+1. `colors.sh` - definicje kolorów dla interfejsu użytkownika
+2. `defaults.sh` - domyślne wartości zmiennych
+3. `main.sh` - główna funkcja programu z logiką wykonania
 
-Uruchom skrypt jako użytkownik root, aby uzyskać pełny dostęp do informacji o systemie:
+#### Pliki główne
 
-```
-sudo ./hello.sh
-```
+1. `hello.sh` - finalny skrypt wygenerowany przez proces scalania
+2. `create_structure.sh` - skrypt tworzący strukturę katalogów projektu
+3. `merge_files.sh` - skrypt łączący wszystkie moduły w jeden wykonywalny skrypt
 
-Po uruchomieniu skryptu zostanie wyświetlone menu główne z różnymi opcjami:
+### Proces generowania skryptu
 
-- Informacje o systemie
-- Zainstalowane pakiety
-- Uruchomione usługi
-- Otwarte porty
-- Programy startowe
-- i wiele innych...
+Finalna wersja `hello.sh` jest generowana przez uruchomienie skryptu `merge_files.sh`, który łączy wszystkie funkcje i moduły w jeden plik wykonawczy. Ten proces umożliwia modułową pracę nad projektem, zachowując wygodę dystrybucji jako pojedynczego pliku.
 
-## Śledzenie zmian
+---
 
-Skrypt umożliwia śledzenie zmian w systemie od określonej daty:
+## Sposób użycia
 
-1. Wybierz opcję "Ustaw datę śledzenia zmian" z menu głównego
-2. Wprowadź datę w jednym z następujących formatów:
-   - YYYY-MM-DD (np. 2023-01-15)
-   - 'X days ago' (np. '30 days ago')
-   - 'last month', 'last week', 'yesterday'
+Hello System Scanner może być używany w dwóch głównych trybach:
+1. **Tryb parametrów wiersza poleceń** - szybkie uruchamianie konkretnych funkcji
+2. **Tryb interaktywny** - menu z wyborem opcji dla łatwiejszego przeglądania
 
-Po ustawieniu daty śledzenia, dodatkowe opcje związane ze zmianami staną się dostępne.
-
-## Generowanie raportów
-
-Skrypt może generować raporty i zapisywać wyniki do pliku:
-
-1. Wybierz opcję "Zapisz wszystko do pliku" z menu głównego
-2. Raport zostanie zapisany w bieżącym katalogu z nazwą zawierającą bieżącą datę i czas
-
-## Wymagania
-
-- System Linux (Ubuntu, Debian, Fedora, CentOS, Arch Linux, itp.)
-- Bash (wersja 4.0+)
-- Podstawowe narzędzia systemowe (find, grep, awk, sed, itp.)
-
-## 🌟 Przegląd
-
-**Hello System Scanner** (`hello.sh`) to zaawansowane narzędzie diagnostyczne dla systemów Linux, które umożliwia kompleksową analizę i śledzenie zmian w systemie. Skrypt zapewnia administratorom, specjalistom DevOps i entuzjastom Linuksa pełny wgląd w instalowane oprogramowanie, uruchomione usługi oraz zmiany systemowe w czasie.
-
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/DevOpsTerminal/hello/blob/main/LICENSE)
-[![Wsparcie](https://img.shields.io/badge/Support-Active-brightgreen.svg)](https://devopsterminal.com/support)
-[![Wersja](https://img.shields.io/badge/Version-1.2.0-blue.svg)](https://github.com/DevOpsTerminal/hello/releases)
-
-## 🚀 Funkcje kluczowe
-
-- **Uniwersalna kompatybilność** - działa na wszystkich głównych dystrybucjach Linux (Ubuntu, Debian, Fedora, CentOS, RHEL, Arch i innych)
-- **Kompleksowa analiza systemu** - wykrywanie zainstalowanego oprogramowania, usług, portów i konfiguracji
-- **Śledzenie zmian w czasie** - identyfikacja zmian dokonanych w określonym czasie
-- **Analiza miesięczna** - przegląd zmian w systemie miesiąc po miesiącu z ostatnich 12 miesięcy
-- **Wizualizacja danych** - graficzne przedstawienie trendów w formie wykresów ASCII
-- **Raportowanie** - generowanie szczegółowych raportów do dalszej analizy
-
-## 📋 Wymagania
-
-- System operacyjny Linux (dowolna dystrybucja)
-- Uprawnienia administratora (root) dla pełnej funkcjonalności
-- Bash w wersji 4.0 lub nowszej
-
-## 🔍 Szybki start
-
-### Instalacja
+### Opcje wiersza poleceń
 
 ```bash
-curl -sSL https://hello.devopsterminal.com/hello.sh | bash
+./hello.sh [OPCJE]
 ```
 
+#### Podstawowe opcje
+
+| Opcja | Pełna nazwa | Opis |
+|-------|-------------|------|
+| `-h` | `--help` | Wyświetla pomoc i listę dostępnych opcji |
+| | `--version` | Wyświetla informacje o wersji programu |
+| | `--all` | Uruchamia wszystkie dostępne funkcje analizy |
+| | `--save-all` | Zapisuje wyniki do pliku |
+
+#### Informacje o systemie
+
+| Opcja | Opis |
+|-------|------|
+| `--system-info` | Podstawowe informacje o systemie operacyjnym |
+| `--packages` | Lista zainstalowanych pakietów |
+| `--services` | Lista uruchomionych usług systemowych |
+| `--ports` | Lista otwartych portów i nasłuchujących usług |
+| `--startup` | Programy uruchamiane przy starcie systemu |
+| `--recent-packages` | Ostatnio zainstalowane pakiety |
+| `--repositories` | Skonfigurowane repozytoria pakietów |
+
+#### Śledzenie zmian
+
+| Opcja | Opis |
+|-------|------|
+| `--track-changes=DATA` | Ustaw datę śledzenia zmian (np. "7 days ago", "2023-01-15") |
+| `--config-changes` | Zmiany w plikach konfiguracyjnych |
+| `--user-changes` | Zmiany w użytkownikach i grupach |
+| `--binary-changes` | Zmiany w plikach binarnych i skryptach |
+| `--scheduled-tasks` | Zmiany w zaplanowanych zadaniach (cron) |
+| `--network-changes` | Zmiany w konfiguracji sieci |
+| `--system-timestamps` | Zmiany w kluczowych plikach systemowych |
+
+#### Raporty miesięczne
+
+| Opcja | Opis |
+|-------|------|
+| `--monthly-report` | Generuje szczegółowy raport miesięczny |
+| `--monthly-stats` | Generuje statystyki miesięczne |
+| `--monthly-visualize` | Generuje wizualizację miesięcznych zmian |
+
+### Przykłady użycia
+
+#### Podstawowe analizy systemu
+
 ```bash
-curl -sSL https://raw.githubusercontent.com/DevOpsTerminal/hello/main/hello.sh | bash
-```
-
-
-```bash
-# Pobranie bezpośrednio z GitHub
-curl -sSL https://github.com/DevOpsTerminal/hello/raw/main/hello.sh -o hello.sh
-chmod +x hello.sh
-./hello.sh
-```
-
-### Podstawowe użycie
-
-```bash
-# Uruchomienie z pełnymi uprawnieniami
-sudo ./hello.sh
-
-# Uruchomienie interaktywnej wersji z menu
-./hello.sh
-```
-
-## 💻 Przykłady użycia
-
-### Analiza systemowa
-
-Uzyskanie kompleksowego widoku systemu:
-
-```bash
+# Wyświetlenie wszystkich informacji o systemie
 sudo ./hello.sh --all
+
+# Sprawdzenie podstawowych informacji o systemie
+sudo ./hello.sh --system-info
+
+# Sprawdzenie zainstalowanych pakietów
+sudo ./hello.sh --packages
+
+# Sprawdzenie otwartych portów
+sudo ./hello.sh --ports
 ```
 
-### Śledzenie zmian od określonej daty
+#### Śledzenie zmian w systemie
 
 ```bash
-# Sprawdzenie zmian od ostatniego miesiąca
-sudo ./hello.sh --track-changes="1 month ago"
+# Sprawdzenie zmian od ostatniego tygodnia
+sudo ./hello.sh --track-changes="1 week ago" --all
 
-# Sprawdzenie zmian od konkretnej daty
-sudo ./hello.sh --track-changes="2023-01-15"
+# Sprawdzenie zmian w plikach konfiguracyjnych od konkretnej daty
+sudo ./hello.sh --track-changes="2023-05-15" --config-changes
+
+# Sprawdzenie zmian w użytkownikach i grupach od miesiąca
+sudo ./hello.sh --track-changes="1 month ago" --user-changes
 ```
 
-### Generowanie raportów miesięcznych
+#### Raporty i statystyki miesięczne
 
 ```bash
-# Generowanie statystyk miesięcznych
-sudo ./hello.sh --monthly-stats
-
-# Szczegółowy raport miesięczny
+# Generowanie pełnego raportu miesięcznego
 sudo ./hello.sh --monthly-report
 
-# Wizualizacja miesięcznych zmian
+# Generowanie statystyk z ostatnich 12 miesięcy
+sudo ./hello.sh --monthly-stats
+
+# Wizualizacja zmian w pakietach
 sudo ./hello.sh --monthly-visualize
 ```
 
-### Zapisywanie wyników do pliku
+#### Łączenie wielu opcji
 
 ```bash
-sudo ./hello.sh --save-all
+# Sprawdzenie zmian w systemie i usługach oraz wygenerowanie raportu
+sudo ./hello.sh --track-changes="2 weeks ago" --services --config-changes --save-all
+
+# Kompleksowa analiza bezpieczeństwa
+sudo ./hello.sh --ports --user-changes --binary-changes --system-timestamps
 ```
 
-## 📈 Przykładowe wyniki
+---
 
-### Wykres zmian miesięcznych
+## Funkcje szczegółowe
 
+### Informacje o systemie
 
-# Wizualizacja miesięcznych zmian
+Funkcja `--system-info` zbiera i wyświetla szczegółowe informacje o systemie operacyjnym:
+
+- Nazwa i wersja dystrybucji
+- Wersja jądra (kernel)
+- Architektura systemu
+- Szacowana data instalacji systemu
+- Podstawowe informacje o sprzęcie (jeśli dostępne)
+
+Przykładowe użycie:
+```bash
+sudo ./hello.sh --system-info
+```
+
+### Zarządzanie pakietami
+
+Hello System Scanner oferuje szereg narzędzi do analizy pakietów:
+
+#### Lista zainstalowanych pakietów (`--packages`)
+
+Wyświetla pełną listę zainstalowanych pakietów, automatycznie wykrywając system zarządzania pakietami:
+- dpkg/apt dla Debian/Ubuntu
+- rpm/dnf/yum dla Fedora/RHEL/CentOS
+- pacman dla Arch Linux
+
+#### Ostatnio zainstalowane pakiety (`--recent-packages`)
+
+Pokazuje listę ostatnio zainstalowanych pakietów wraz z datami instalacji.
+
+#### Repozytoria pakietów (`--repositories`)
+
+Wyświetla skonfigurowane repozytoria pakietów:
+- Repozytoria APT dla Debian/Ubuntu
+- Repozytoria YUM/DNF dla Fedora/RHEL/CentOS
+- Repozytoria Pacman dla Arch Linux
+
+### Usługi i procesy
+
+#### Uruchomione usługi (`--services`)
+
+Analizuje i wyświetla uruchomione usługi systemowe:
+- Usługi systemd
+- Usługi init.d
+- Aktywne stany usług
+
+#### Programy startowe (`--startup`)
+
+Wyświetla programy i usługi uruchamiane przy starcie systemu:
+- Usługi systemowe włączone przy starcie
+- Programy startowe XDG
+- Zawartość rc.local
+
+### Analiza sieci
+
+#### Otwarte porty (`--ports`)
+
+Skanuje i wyświetla informacje o otwartych portach i usługach nasłuchujących:
+- Numer portu i protokół (TCP/UDP)
+- Proces nasłuchujący (jeśli identyfikowalny)
+- Interfejs sieciowy
+
+```bash
+sudo ./hello.sh --ports
+```
+
+#### Konfiguracja sieci (`--network-changes`)
+
+Analizuje pliki konfiguracyjne sieci:
+- Konfiguracja interfejsów
+- Ustawienia DNS
+- Konfiguracja routingu
+
+### Śledzenie zmian w systemie
+
+Hello System Scanner umożliwia śledzenie zmian w systemie od określonej daty:
+
+```bash
+sudo ./hello.sh --track-changes="2023-06-01"
+```
+
+Obsługiwane formaty dat:
+- YYYY-MM-DD (np. "2023-06-01")
+- Relative dates (np. "7 days ago", "1 month ago")
+- Określenia: "yesterday", "last week", "last month"
+
+#### Zmiany w plikach konfiguracyjnych (`--config-changes`)
+
+Śledzi zmiany w katalogu `/etc` i innych lokalizacjach konfiguracyjnych.
+
+#### Zmiany dotyczące użytkowników (`--user-changes`)
+
+Monitoruje zmiany w kontach użytkowników i grupach:
+- Modyfikacje plików /etc/passwd, /etc/shadow, /etc/group
+- Logi dotyczące dodawania/usuwania/modyfikacji użytkowników
+
+#### Zmiany w plikach binarnych (`--binary-changes`)
+
+Śledzi zmiany w plikach wykonywalnych i skryptach systemowych.
+
+#### Zmiany w zadaniach cron (`--scheduled-tasks`)
+
+Monitoruje zmiany w zaplanowanych zadaniach:
+- Zadania cron
+- Timery systemd
+
+#### Zmiany w kluczowych plikach systemowych (`--system-timestamps`)
+
+Sprawdza czasy modyfikacji ważnych plików systemowych:
+- Pliki konfiguracyjne boot
+- Konfiguracja sieciowa
+- Konfiguracja bezpieczeństwa
+- Moduły jądra
+
+### Raporty miesięczne
+
+Hello System Scanner oferuje zaawansowane narzędzia do analizy trendów w systemie:
+
+#### Szczegółowy raport miesięczny (`--monthly-report`)
+
+Generuje pełny raport zmian dla każdego miesiąca z ostatnich 12 miesięcy:
+- Zainstalowane pakiety w poszczególnych miesiącach
+- Zmiany w usługach
+- Zmiany w plikach konfiguracyjnych
+
+```bash
+sudo ./hello.sh --monthly-report
+```
+
+#### Statystyki miesięczne (`--monthly-stats`)
+
+Generuje tabelę statystyk dla każdego miesiąca:
+- Liczba zainstalowanych pakietów
+- Liczba zmodyfikowanych usług
+- Liczba zmian w plikach konfiguracyjnych
+- Zmiany w użytkownikach
+- Zmiany w konfiguracji sieci
+
+```bash
+sudo ./hello.sh --monthly-stats
+```
+
+#### Wizualizacja zmian miesięcznych (`--monthly-visualize`)
+
+Tworzy graficzną reprezentację zmian w systemie:
+- Wykres słupkowy zainstalowanych pakietów
+- Prezentacja trendów w czasie
+
 ```bash
 sudo ./hello.sh --monthly-visualize
 ```
+
+---
+
+## Wyniki i wizualizacje
+
+Hello System Scanner generuje różnorodne wyniki w formie tekstu i wizualizacji.
+
+### Wykresy miesięcznych zmian
 
 ```
 Zainstalowane pakiety miesięcznie:
@@ -205,7 +465,7 @@ Zainstalowane pakiety miesięcznie:
        Sty Feb Mar Kwi Maj Cze Lip Sie Wrz Paź Lis Gru
 ```
 
-### Fragment tabeli statystyk miesięcznych
+### Tabele statystyk miesięcznych
 
 ```
 Miesiąc         Pakiety Usługi Konfiguracje Użytkownicy Sieć
@@ -214,6 +474,17 @@ Styczeń 2023    45      12     87           2           4
 Luty 2023       12      3      24           0           1
 Marzec 2023     28      5      32           1           2
 ```
+
+### Zapisywanie wyników do pliku
+
+Wszystkie wyniki mogą być zapisane do pliku za pomocą opcji `--save-all`:
+
+```bash
+sudo ./hello.sh --monthly-stats --save-all
+```
+
+Skrypt generuje plik raportu z nazwą zawierającą datę i czas, np. `system_software_20230710_152233.txt`.
+
 
 ## Examples
 
@@ -231,124 +502,235 @@ Marzec 2023     28      5      32           1           2
 ![18.png](img/17.png)
 
 
-## 🔧 Opcje zaawansowane
+---
 
-| Opcja                      | Opis                                            |
-|----------------------------|------------------------------------------------|
-| `--system-info`            | Podstawowe informacje o systemie               |
-| `--packages`               | Lista zainstalowanych pakietów                 |
-| `--services`               | Lista uruchomionych usług                      |
-| `--ports`                  | Lista otwartych portów                         |
-| `--startup`                | Programy uruchamiane na starcie                |
-| `--recent-packages`        | Ostatnio zainstalowane pakiety                 |
-| `--repositories`           | Skonfigurowane repozytoria                     |
-| `--config-changes`         | Zmiany w plikach konfiguracyjnych              |
-| `--user-changes`           | Zmiany w użytkownikach i grupach               |
-| `--binary-changes`         | Zmiany w plikach binarnych i skryptach         |
-| `--scheduled-tasks`        | Zmiany w zaplanowanych zadaniach               |
-| `--network-changes`        | Zmiany w konfiguracji sieci                    |
-| `--system-file-changes`    | Zmiany w kluczowych plikach systemowych        |
+## Rozwijanie projektu
 
-## ⚙️ Rozwiązywanie problemów
+Hello System Scanner jest projektem modułowym, co ułatwia rozszerzanie jego funkcjonalności.
 
-### Typowe problemy
+### Tworzenie nowych funkcji
 
-1. **Brak uprawnień**
+1. Utwórz nowy plik funkcji w katalogu `src/functions/`:
+   ```bash
+   touch src/functions/my_new_function.sh
    ```
-   Uwaga: Skrypt nie jest uruchomiony jako root. Niektóre informacje mogą być niedostępne.
+
+2. Zaimplementuj funkcję w pliku:
+   ```bash
+   #!/bin/bash
+   
+   # Opis nowej funkcji
+   my_new_function() {
+       print_header "Nagłówek mojej nowej funkcji"
+       
+       # Implementacja funkcji
+       echo "Przykładowy wynik"
+   }
    ```
-   **Rozwiązanie**: Uruchom skrypt z uprawnieniami administratora (`sudo ./hello.sh`)
 
-2. **Brak znalezionego menedżera pakietów**
+3. Uruchom skrypt łączący, aby wygenerować zaktualizowany plik hello.sh:
+   ```bash
+   ./scripts/merge.sh
    ```
-   Nie znaleziono znanego menedżera pakietów
-   ```
-   **Rozwiązanie**: Sprawdź, czy system używa nietypowego menedżera pakietów lub skontaktuj się z pomocą techniczną.
 
-### Kontakt i pomoc techniczna
+### Modyfikacja istniejących funkcji
 
-Jeśli napotkasz problemy podczas korzystania z naszych narzędzi:
+1. Zlokalizuj plik funkcji w katalogu `src/functions/`
+2. Wprowadź zmiany
+3. Uruchom skrypt łączący, aby wygenerować zaktualizowany skrypt
 
-- **Dokumentacja**: [docs.devopsterminal.com](https://docs.devopsterminal.com)
-- **GitHub Issues**: [github.com/DevOpsTerminal/hello/issues](https://github.com/DevOpsTerminal/hello/issues)
-- **Wsparcie e-mail**: support@devopsterminal.com
-- **Live Chat**: Dostępny na naszej stronie [devopsterminal.com](https://devopsterminal.com)
-- **Konsultacje wideo**: Zarezerwuj sesję pomocy przez [devopsterminal.com/video-support](https://devopsterminal.com/video-support)
+### Zgłaszanie problemów i propozycji
 
-## 💰 Wersje i cennik
+Zachęcamy do zgłaszania problemów i propozycji ulepszeń poprzez system GitHub Issues:
+[github.com/DevOpsTerminal/hello/issues](https://github.com/DevOpsTerminal/hello/issues)
 
-| Wersja             | Funkcje                                   | Cena              | Link                                         |
-|--------------------|-----------------------------------------|-------------------|----------------------------------------------|
-| **Community**      | Podstawowe skanowanie i raporty         | Darmowa           | [Pobierz](https://github.com/DevOpsTerminal/hello) |
-| **Professional**   | Wszystkie funkcje + historie miesięczne | $10 USD (jednorazowo) | [Kup teraz](https://devopsterminal.com/buy) |
-| **Enterprise**     | Pro + wsparcie + aktualizacje           | Kontakt           | [Zapytaj o cenę](https://devopsterminal.com/enterprise) |
+### Tworzenie pull requestów
 
-### Opcje płatności
-- PayPal
-- Karty kredytowe
-- Przelewy bankowe (tylko Enterprise)
-- Kryptowaluty (BTC, ETH)
-
-## 📜 Licencja
-
-Ten projekt jest objęty licencją MIT - szczegóły w pliku [LICENSE](https://github.com/DevOpsTerminal/hello/blob/main/LICENSE).
-
-## 🤝 Współpraca
-
-Jesteśmy otwarci na współpracę! Jeśli chcesz przyczynić się do rozwoju projektu:
-
-1. Stwórz fork repozytorium
+1. Utwórz fork repozytorium
 2. Utwórz swoją gałąź funkcji (`git checkout -b feature/AmazingFeature`)
 3. Zatwierdź swoje zmiany (`git commit -m 'Add some AmazingFeature'`)
 4. Wypchnij do gałęzi (`git push origin feature/AmazingFeature`)
 5. Otwórz Pull Request
 
+---
 
-Poniżej znajduje się lista wszystkich plików w projekcie Linux Software Finder:
+## Rozwiązywanie problemów
 
-### Pliki główne:
-1. `hello.sh` - finalny skrypt (wygenerowany)
-2. `create_structure.sh` - skrypt tworzący strukturę folderów
-3. `merge_files.sh` - skrypt łączący pliki w jeden skrypt wykonawczy
-4. `README.md` - dokumentacja projektu
+### Typowe problemy i rozwiązania
 
-### Katalog src/main/:
-1. `src/main/colors.sh` - definicje kolorów dla interfejsu
-2. `src/main/defaults.sh` - domyślne wartości zmiennych
-3. `src/main/main.sh` - główna funkcja programu
+#### Problem: Brak uprawnień dostępu
 
-### Katalog src/functions/:
-1. `src/functions/print_header.sh` - funkcja wyświetlająca nagłówki
-2. `src/functions/command_exists.sh` - sprawdzanie dostępności polecenia
-3. `src/functions/date_timestamp.sh` - funkcje obsługi dat i czasów
-4. `src/functions/detect_distro.sh` - wykrywanie dystrybucji Linux
-5. `src/functions/get_system_info.sh` - pobieranie informacji o systemie
-6. `src/functions/get_installed_packages.sh` - pobieranie listy zainstalowanych pakietów
-7. `src/functions/get_running_services.sh` - pobieranie listy uruchomionych usług
-8. `src/functions/check_open_ports.sh` - sprawdzanie otwartych portów
-9. `src/functions/check_startup_programs.sh` - sprawdzanie programów startowych
-10. `src/functions/check_config_changes.sh` - sprawdzanie zmian w plikach konfiguracyjnych
-11. `src/functions/find_recent_packages.sh` - znajdowanie ostatnio zainstalowanych pakietów
-12. `src/functions/check_repositories.sh` - sprawdzanie repozytoriów
-13. `src/functions/track_user_changes.sh` - śledzenie zmian w użytkownikach i grupach
-14. `src/functions/track_binary_changes.sh` - śledzenie zmian w plikach binarnych
-15. `src/functions/track_scheduled_tasks.sh` - śledzenie zmian w zadaniach cron
-16. `src/functions/check_network_changes.sh` - sprawdzanie zmian w konfiguracji sieci
-17. `src/functions/check_system_timestamps.sh` - sprawdzanie czasów modyfikacji plików systemowych
-18. `src/functions/visualize_monthly_changes.sh` - wizualizacja zmian miesięcznych
-19. `src/functions/generate_monthly_stats.sh` - generowanie statystyk miesięcznych
-20. `src/functions/generate_monthly_reports.sh` - generowanie raportów miesięcznych
-21. `src/functions/save_results.sh` - zapisywanie wyników do pliku
-22. `src/functions/set_tracking_date.sh` - ustawianie daty śledzenia zmian
+**Komunikat:**
+```
+Uwaga: Skrypt nie jest uruchomiony jako root. Niektóre informacje mogą być niedostępne.
+```
 
-Ta struktura zapewnia modułową organizację kodu, gdzie każda funkcja jest w osobnym pliku, co ułatwia utrzymanie i rozwijanie projektu.
+**Rozwiązanie:**
+Uruchom skrypt z uprawnieniami administratora:
+```bash
+sudo ./hello.sh
+```
 
+#### Problem: Brak znalezionego menedżera pakietów
+
+**Komunikat:**
+```
+Nie znaleziono znanego menedżera pakietów
+```
+
+**Rozwiązanie:**
+- Sprawdź, czy system używa nietypowego menedżera pakietów
+- Upewnij się, że podstawowe narzędzia są zainstalowane
+- Skontaktuj się ze wsparciem technicznym dla niestandardowych dystrybucji
+
+#### Problem: Nieprawidłowy format daty przy śledzeniu zmian
+
+**Komunikat:**
+```
+Nieprawidłowy format daty: [wprowadzona_data]
+```
+
+**Rozwiązanie:**
+Użyj jednego z obsługiwanych formatów daty:
+```bash
+sudo ./hello.sh --track-changes="2023-06-01"
+sudo ./hello.sh --track-changes="7 days ago"
+sudo ./hello.sh --track-changes="last month"
+```
+
+#### Problem: Brak dostępu do logów systemowych
+
+**Komunikat:**
+```
+Brak dostępnych logów dla tego miesiąca
+```
+
+**Rozwiązanie:**
+- Upewnij się, że logijesz się jako root
+- Sprawdź, czy logi systemowe są dostępne w standardowej lokalizacji
+- W niektórych systemach logi mogą być rotowane lub przechowywane w niestandardowych lokalizacjach
+
+### Diagnostyka zaawansowana
+
+Aby dokładniej przeanalizować problem:
+
+1. Sprawdź wersję bash:
+   ```bash
+   bash --version
+   ```
+
+2. Upewnij się, że wszystkie wymagane narzędzia są dostępne:
+   ```bash
+   which find grep awk sed stat date
+   ```
+
+3. Sprawdź uprawnienia do kluczowych katalogów:
+   ```bash
+   ls -la /var/log/
+   ls -la /etc/
+   ```
+
+### Zgłaszanie błędów
+
+Jeśli napotkasz problem, który nie jest opisany w tej dokumentacji:
+
+1. Zbierz informacje diagnostyczne:
+   - Wersja skryptu (`./hello.sh --version`)
+   - Dystrybucja Linux i wersja
+   - Dokładny komunikat błędu
+   - Kroki, aby odtworzyć problem
+
+2. Utwórz zgłoszenie problemu na GitHub:
+   [github.com/DevOpsTerminal/hello/issues](https://github.com/DevOpsTerminal/hello/issues)
 
 ---
 
-<p align="center">
-  Tworzony z ❤️ przez zespół <a href="https://devopsterminal.com">DevOpsTerminal</a>
-</p>
-<p align="center">
-  © 2023-2025 DevOpsTerminal. Wszelkie prawa zastrzeżone.
-</p>
+## Często zadawane pytania (FAQ)
+
+### Ogólne
+
+#### Czy skrypt jest bezpieczny do użycia na systemach produkcyjnych?
+
+Tak, skrypt działa wyłącznie w trybie odczytu i nie wprowadza żadnych zmian w systemie. Jest to bezpieczne narzędzie diagnostyczne.
+
+#### Czy Hello System Scanner działa na wszystkich dystrybucjach Linux?
+
+Skrypt został zaprojektowany do pracy z większością popularnych dystrybucji. Może wymagać dostosowania dla niszowych lub wysoce zmodyfikowanych systemów.
+
+#### Czy mogę używać Hello System Scanner bez uprawnień roota?
+
+Tak, jednak niektóre funkcje będą ograniczone. Bez uprawnień roota, skrypt nie będzie mógł dostępować do niektórych plików systemowych i logów.
+
+### Funkcjonalność
+
+#### Jak dużo przestrzeni dyskowej zajmuje skrypt?
+
+Sam skrypt jest bardzo lekki (zwykle poniżej 500KB). Generowane raporty również są niewielkie, zazwyczaj poniżej 1MB, chyba że system ma ekstremalnie dużo zainstalowanych pakietów.
+
+#### Czy skrypt działa na serwerach bez środowiska graficznego?
+
+Tak, skrypt jest zaprojektowany do pracy w środowisku tekstowym i nie wymaga środowiska graficznego.
+
+#### Czy mogę uruchomić skrypt z harmonogramu (cron)?
+
+Tak, skrypt może być uruchamiany z crona, na przykład do regularnego generowania raportów:
+
+```bash
+# Przykład uruchomienia cotygodniowego raportu
+0 0 * * 0 /path/to/hello.sh --monthly-stats --save-all
+```
+
+### Dane i prywatność
+
+#### Czy skrypt wysyła jakiekolwiek dane do zewnętrznych serwerów?
+
+Nie, Hello System Scanner działa całkowicie lokalnie i nie wysyła żadnych danych na zewnątrz systemu.
+
+#### Czy wykrywa dane osobowe lub wrażliwe?
+
+Skrypt skupia się na analizie plików systemowych i konfiguracyjnych, nie analizuje danych użytkownika ani zawartości plików osobistych.
+
+---
+
+## Porównanie wersji
+
+| Funkcja | Community (Free) | Professional | Enterprise |
+|---------|-----------------|--------------|------------|
+| Podstawowa analiza systemu | ✅ | ✅ | ✅ |
+| Analiza pakietów i usług | ✅ | ✅ | ✅ |
+| Śledzenie zmian w systemie | ✅ | ✅ | ✅ |
+| Raporty miesięczne | ✅ | ✅ | ✅ |
+| Rozszerzone wizualizacje | ❌ | ✅ | ✅ |
+| Wykrywanie anomalii | ❌ | ✅ | ✅ |
+| Eksport do CSV/JSON | ❌ | ✅ | ✅ |
+| Raportowanie PDF/HTML | ❌ | ❌ | ✅ |
+| Integracja z systemami monitoringu | ❌ | ❌ | ✅ |
+| Powiadomienia o zmianach | ❌ | ❌ | ✅ |
+| Wsparcie priorytetowe | ❌ | ❌ | ✅ |
+| Dedykowane konsultacje | ❌ | ❌ | ✅ |
+| **Cena** | Darmowa | $10 (jednorazowo) | Kontakt |
+
+### Opcje aktualizacji do wersji Pro
+
+Aby zakupić wersję Professional, odwiedź stronę:
+[devopsterminal.com/buy](https://devopsterminal.com/buy)
+
+### Zapytanie o wersję Enterprise
+
+Dla rozwiązań skalowalnych dla dużych organizacji, skontaktuj się z nami:
+[devopsterminal.com/enterprise](https://devopsterminal.com/enterprise)
+
+
+## Licencja i prawa autorskie
+
+Hello System Scanner jest objęty licencją Apache2. Pełny tekst licencji jest dostępny w pliku [LICENSE](https://github.com/DevOpsTerminal/hello/blob/main/LICENSE).
+
+
+## Kontakt i wsparcie
+
+### Pomoc techniczna
+
+W przypadku pytań lub problemów technicznych, oferujemy następujące opcje pomocy:
+
+- **Dokumentacja online**: [docs.devopsterminal.com](https://docs.devopsterminal.com)
+- **GitHub Issues**: [github.
