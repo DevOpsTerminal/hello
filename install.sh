@@ -3,6 +3,7 @@
 # Konfiguracja źródeł
 PROJECT_BASE_URL="https://raw.githubusercontent.com/DevOpsTerminal/hello/main"
 SCRIPT_NAME="hello.sh"
+INSTALL_NAME="install.sh"
 CHECKSUM_FILE="checksums/checksums.sha256"
 
 # Domyślna ścieżka instalacji użytkownika
@@ -106,6 +107,7 @@ download_and_verify() {
 
     # Usuń tymczasowy plik
     rm "${SCRIPT_NAME}"
+    rm "${INSTALL_NAME}"
 
     # Uruchom skrypt z opcją help
     echo "Uruchamianie skryptu z opcją help..." >&2
