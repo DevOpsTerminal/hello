@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.5] - 2025-04-03
+
+### Added
+- Changes in main/colors.sh
+- Changes in main/defaults.sh
+- Changes in main/main.sh
+
+### Removed
+- Changes in scripts/structure.sh
+- Changes in src/main.sh
+
 ## [0.1.4] - 2025-04-03
 
 ## [0.1.3] - 2025-04-03

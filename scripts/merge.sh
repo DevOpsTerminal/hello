@@ -3,9 +3,9 @@
 # Skrypt do łączenia wszystkich plików funkcji w jeden plik wykonawczy
 
 # Lokalizacja plików
-MAIN_DIR="src/main"
-FUNCTIONS_DIR="src/functions"
-OUTPUT_FILE="linux_software_finder.sh"
+MAIN_DIR="main"
+FUNCTIONS_DIR="src"
+OUTPUT_FILE="hello.sh"
 
 # Nagłówek pliku
 cat > "$OUTPUT_FILE" << 'EOF'

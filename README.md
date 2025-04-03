@@ -31,19 +31,15 @@ hello/
 
 ### Rozwój i modyfikacja
 
-1. Utwórz strukturę katalogów używając `create_structure.sh`:
-   ```
-   ./scripts/structure.sh
-   ```
 
-2. Modyfikuj poszczególne pliki z funkcjami w katalogu `src/functions/` lub pliki konfiguracyjne w `src/main/`.
+Modyfikuj poszczególne pliki z funkcjami w katalogu `src/functions/` lub pliki konfiguracyjne w `src/main/`.
 
-3. Po zakończeniu modyfikacji, użyj skryptu `merge_files.sh` aby połączyć wszystkie pliki w jeden wykonawczy skrypt:
+Po zakończeniu modyfikacji, użyj skryptu `merge_files.sh` aby połączyć wszystkie pliki w jeden wykonawczy skrypt:
    ```
    ./scripts/merge.sh
    ```
 
-4. Wygenerowany skrypt `hello.sh` jest gotowy do uruchomienia:
+Wygenerowany skrypt `hello.sh` jest gotowy do uruchomienia:
    ```
    ./hello.sh
    ```
@@ -118,12 +114,19 @@ Skrypt może generować raporty i zapisywać wyniki do pliku:
 ### Instalacja
 
 ```bash
+curl -sSL https://hello.devopsterminal.com/hello.sh | bash
+```
+
+```bash
+curl -sSL https://raw.githubusercontent.com/DevOpsTerminal/hello/main/hello.sh | bash
+```
+
+
+```bash
 # Pobranie bezpośrednio z GitHub
 curl -sSL https://github.com/DevOpsTerminal/hello/raw/main/hello.sh -o hello.sh
 chmod +x hello.sh
-
-# LUB instalacja przez instalator
-curl -sSL https://devopsterminal.com/install | bash
+./hello.sh
 ```
 
 ### Podstawowe użycie
@@ -178,6 +181,12 @@ sudo ./hello.sh --save-all
 ## 📈 Przykładowe wyniki
 
 ### Wykres zmian miesięcznych
+
+
+# Wizualizacja miesięcznych zmian
+```bash
+sudo ./hello.sh --monthly-visualize
+```
 
 ```
 Zainstalowane pakiety miesięcznie:
