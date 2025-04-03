@@ -15,11 +15,11 @@ log_error() {
 }
 
 log_success() {
-    echo -e "\e[32m[SUKCES]\e[0m $1"
+    echo -e "\e[32m[SUKCES]\e[0m $1" >&2
 }
 
 log_info() {
-    echo -e "\e[34m[INFO]\e[0m $1"
+    echo -e "\e[34m[INFO]\e[0m $1" >&2
 }
 
 # Funkcja sprawdzająca uprawnienia roota
