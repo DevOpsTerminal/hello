@@ -60,6 +60,7 @@ Skrypt automatycznie wykrywa menedżer pakietów i dostosowuje swoje działanie 
 
 ## Instalacja
 
+![install.png](img/install.png)
 ### Wymagania systemowe
 
 - System operacyjny Linux (dowolna wspierana dystrybucja)

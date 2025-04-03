@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.13] - 2025-04-03
+
+### Added
+- Changes in img/install.png
+
 ## [0.1.12] - 2025-04-03
 
 ## [0.1.11] - 2025-04-03
