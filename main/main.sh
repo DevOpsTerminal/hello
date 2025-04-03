@@ -4,132 +4,96 @@ main() {
     TRACK_CHANGES=false
     SINCE_DATE="$DEFAULT_SINCE_DATE"
 
-    # Parsowanie argumentów linii poleceń
-    if [ "$#" -gt 0 ]; then
-        # Tryb linii poleceń
-        for arg in "$@"; do
-            case $arg in
-                --track-changes=*)
-                    date_value="${arg#*=}"
-                    if date -d "$date_value" >/dev/null 2>&1; then
-                        SINCE_DATE=$(date -d "$date_value" +"%Y-%m-%d")
-                        TRACK_CHANGES=true
-                        echo -e "${GREEN}Data śledzenia zmian ustawiona na: ${YELLOW}$SINCE_DATE${RESET}"
-
-                        # Wyświetl wszystkie informacje z śledzeniem zmian
-                        get_system_info
-                        get_installed_packages
-                        get_running_services
-                        check_open_ports
-                        check_startup_programs
-                        find_recent_packages
-                        check_repositories
-                        check_config_changes
-                        track_user_changes
-                        track_binary_changes
-                        track_scheduled_tasks
-                        check_network_changes
-                        check_system_timestamps
-                    else
-                        echo -e "${RED}Nieprawidłowy format daty: $date_value${RESET}"
-                    fi
-                    exit 0
-                    ;;
-                --monthly-stats)
-                    generate_monthly_stats
-                    exit 0
-                    ;;
-                --monthly-report)
-                    generate_monthly_reports
-                    exit 0
-                    ;;
-                --monthly-visualize)
-                    visualize_monthly_changes
-                    exit 0
-                    ;;
-                --save-all)
-                    save_results
-                    exit 0
-                    ;;
-                --help|-h)
-                    display_help
-                    exit 0
-                    ;;
-                *)
-                    echo -e "${RED}Nieznany parametr: $arg${RESET}"
-                    display_help
-                    exit 1
-                    ;;
-            esac
-        done
-
+    # Jeśli brak argumentów, wyświetl pomoc
+    if [ "$#" -eq 0 ]; then
+        display_help
         exit 0
-    else
-        # Tryb interaktywny
-        run_interactive_menu
-    fi
-}
-
-# Funkcja uruchamiająca interaktywne menu
-run_interactive_menu() {
-    echo -e "${BLUE}===== Linux Software Finder =====${RESET}"
-    echo -e "${YELLOW}Ten skrypt identyfikuje zainstalowane oprogramowanie i usługi${RESET}"
-    echo -e "${YELLOW}oraz śledzi zmiany w systemie od określonej daty${RESET}"
-
-    # Sprawdź, czy skrypt jest uruchomiony jako root
-    if [ "$(id -u)" != "0" ]; then
-        echo -e "${RED}Uwaga: Skrypt nie jest uruchomiony jako root. Niektóre informacje mogą być niedostępne.${RESET}"
-        echo -e "${YELLOW}Zalecane ponowne uruchomienie z sudo:${RESET} sudo $0\n"
-        read -r -p "Kontynuować mimo to? (t/n): " -n 1 REPLY
-        echo
-        if [[ ! $REPLY =~ ^[Tt]$ ]]; then
-            exit 1
-        fi
     fi
 
-    # Menu będzie działać aż do jawnego wyjścia
-    while true; do
-        # Wyczyść ekran dla lepszej czytelności
-        clear
-
-        echo -e "${BLUE}===== Menu główne =====${RESET}"
-        if [ "$TRACK_CHANGES" = true ]; then
-            echo -e "${CYAN}Śledzenie zmian włączone od: $SINCE_DATE${RESET}"
-        else
-            echo -e "${YELLOW}Śledzenie zmian wyłączone${RESET}"
-        fi
-        echo
-
-        # Wypisz menu opcji
-        echo " 1) Wyświetl wszystkie informacje"
-        echo " 2) Informacje o systemie"
-        echo " 3) Zainstalowane pakiety"
-        echo " 4) Uruchomione usługi"
-        echo " 5) Otwarte porty"
-        echo " 6) Programy startowe"
-        echo " 7) Ostatnio zainstalowane pakiety"
-        echo " 8) Skonfigurowane repozytoria"
-        echo " 9) Ustaw datę śledzenia zmian"
-        echo "10) Zmiany w plikach konfiguracyjnych"
-        echo "11) Zmiany w użytkownikach/grupach"
-        echo "12) Zmiany w plikach binarnych"
-        echo "13) Zmiany w zaplanowanych zadaniach"
-        echo "14) Zmiany w konfiguracji sieci"
-        echo "15) Zmiany w kluczowych plikach systemowych"
-        echo "16) Raport zmian miesięcznych (ostatnie 12 miesięcy)"
-        echo "17) Statystyki miesięczne (ostatnie 12 miesięcy)"
-        echo "18) Wizualizacja zmian miesięcznych"
-        echo "19) Zapisz wszystko do pliku"
-        echo "20) Pomoc"
-        echo "21) Wyjście"
-        echo
-
-        # Odczytaj wybór użytkownika
-        read -r -p "Wybierz opcję (1-21): " choice
-
-        # Obsłuż wybór użytkownika
-        case $choice in
-            1)  # Wyświetl wszystkie informacje
+    # Parsowanie argumentów linii poleceń
+    while [ "$#" -gt 0 ]; do
+        case "$1" in
+            --track-changes=*)
+                date_value="${1#*=}"
+                if date -d "$date_value" >/dev/null 2>&1; then
+                    SINCE_DATE=$(date -d "$date_value" +"%Y-%m-%d")
+                    TRACK_CHANGES=true
+                    echo -e "${GREEN}Data śledzenia zmian ustawiona na: ${YELLOW}$SINCE_DATE${RESET}"
+                    shift
+                else
+                    echo -e "${RED}Nieprawidłowy format daty: $date_value${RESET}"
+                    exit 1
+                fi
+                ;;
+            --system-info)
+                get_system_info
+                shift
+                ;;
+            --packages)
+                get_installed_packages
+                shift
+                ;;
+            --services)
+                get_running_services
+                shift
+                ;;
+            --ports)
+                check_open_ports
+                shift
+                ;;
+            --startup)
+                check_startup_programs
+                shift
+                ;;
+            --recent-packages)
+                find_recent_packages
+                shift
+                ;;
+            --repositories)
+                check_repositories
+                shift
+                ;;
+            --config-changes)
+                check_config_changes
+                shift
+                ;;
+            --user-changes)
+                track_user_changes
+                shift
+                ;;
+            --binary-changes)
+                track_binary_changes
+                shift
+                ;;
+            --scheduled-tasks)
+                track_scheduled_tasks
+                shift
+                ;;
+            --network-changes)
+                check_network_changes
+                shift
+                ;;
+            --system-timestamps)
+                check_system_timestamps
+                shift
+                ;;
+            --monthly-report)
+                generate_monthly_reports
+                shift
+                ;;
+            --monthly-stats)
+                generate_monthly_stats
+                shift
+                ;;
+            --monthly-visualize)
+                visualize_monthly_changes
+                shift
+                ;;
+            --save-all)
+                save_results
+                shift
+                ;;
+            --all)
                 get_system_info
                 get_installed_packages
                 get_running_services
@@ -137,6 +101,7 @@ run_interactive_menu() {
                 check_startup_programs
                 find_recent_packages
                 check_repositories
+
                 if [ "$TRACK_CHANGES" = true ]; then
                     check_config_changes
                     track_user_changes
@@ -145,101 +110,109 @@ run_interactive_menu() {
                     check_network_changes
                     check_system_timestamps
                 fi
+                shift
                 ;;
-            2)  # Informacje o systemie
-                get_system_info
+            --version)
+                echo -e "${GREEN}Linux Software Finder v1.0${RESET}"
+                echo -e "${CYAN}Copyright (c) 2023 DevOpsTerminal${RESET}"
+                shift
                 ;;
-            3)  # Zainstalowane pakiety
-                get_installed_packages
-                ;;
-            4)  # Uruchomione usługi
-                get_running_services
-                ;;
-            5)  # Otwarte porty
-                check_open_ports
-                ;;
-            6)  # Programy startowe
-                check_startup_programs
-                ;;
-            7)  # Ostatnio zainstalowane pakiety
-                find_recent_packages
-                ;;
-            8)  # Skonfigurowane repozytoria
-                check_repositories
-                ;;
-            9)  # Ustaw datę śledzenia zmian
-                set_tracking_date
-                ;;
-            10) # Zmiany w plikach konfiguracyjnych
-                check_config_changes
-                ;;
-            11) # Zmiany w użytkownikach/grupach
-                track_user_changes
-                ;;
-            12) # Zmiany w plikach binarnych
-                track_binary_changes
-                ;;
-            13) # Zmiany w zaplanowanych zadaniach
-                track_scheduled_tasks
-                ;;
-            14) # Zmiany w konfiguracji sieci
-                check_network_changes
-                ;;
-            15) # Zmiany w kluczowych plikach systemowych
-                check_system_timestamps
-                ;;
-            16) # Raport zmian miesięcznych
-                generate_monthly_reports
-                ;;
-            17) # Statystyki miesięczne
-                generate_monthly_stats
-                ;;
-            18) # Wizualizacja zmian miesięcznych
-                visualize_monthly_changes
-                ;;
-            19) # Zapisz wszystko do pliku
-                save_results
-                ;;
-            20) # Pomoc
+            --help|-h)
                 display_help
+                shift
                 ;;
-            21) # Wyjście
-                echo -e "${GREEN}Do widzenia!${RESET}"
-                exit 0
-                ;;
-            *)  # Nieprawidłowa opcja
-                echo -e "${RED}Nieprawidłowa opcja. Wybierz liczbę od 1 do 21.${RESET}"
+            *)
+                echo -e "${RED}Nieznany parametr: $1${RESET}"
+                echo -e "${YELLOW}Użyj --help aby zobaczyć dostępne opcje.${RESET}"
+                exit 1
                 ;;
         esac
-
-        # Pauza po każdej operacji aby użytkownik mógł przeczytać wyniki
-        echo
-        read -r -p "${YELLOW}Naciśnij Enter, aby kontynuować...${RESET}" dummy
     done
+
+    # Jeśli włączone śledzenie zmian ale nie podano konkretnej funkcji
+    if [ "$TRACK_CHANGES" = true ] && [ "$#" -eq 0 ]; then
+        echo -e "${YELLOW}Podano tylko datę śledzenia zmian. Wyświetlam wszystkie informacje...${RESET}"
+        get_system_info
+        get_installed_packages
+        get_running_services
+        check_open_ports
+        check_startup_programs
+        find_recent_packages
+        check_repositories
+        check_config_changes
+        track_user_changes
+        track_binary_changes
+        track_scheduled_tasks
+        check_network_changes
+        check_system_timestamps
+    fi
+
+    exit 0
 }
 
-# Funkcja pomocy
+# Funkcja pomocy - szczegółowy opis dostępnych opcji
 display_help() {
-    echo -e "${BLUE}===== Linux Software Finder - Pomoc =====${RESET}"
-    echo -e "${GREEN}Użycie:${RESET}"
-    echo -e "  $0 [opcje]"
+    echo -e "${BLUE}===========================================================${RESET}"
+    echo -e "${GREEN}Linux Software Finder - narzędzie do analizy systemu Linux${RESET}"
+    echo -e "${BLUE}===========================================================${RESET}"
+    echo -e "${YELLOW}Wersja 1.0${RESET}"
+    echo -e "Ten skrypt identyfikuje zainstalowane oprogramowanie i usługi w systemie Linux oraz umożliwia śledzenie zmian od określonej daty."
     echo
-    echo -e "${GREEN}Opcje:${RESET}"
-    echo -e "  --track-changes=DATA     Ustaw datę śledzenia zmian"
+    echo -e "${CYAN}SPOSÓB UŻYCIA:${RESET}"
+    echo -e "  $0 [OPCJE]"
+    echo
+    echo -e "${CYAN}PODSTAWOWE OPCJE:${RESET}"
+    echo -e "  --help, -h               Wyświetla tę pomoc"
+    echo -e "  --version                Wyświetla informacje o wersji programu"
+    echo -e "  --all                    Wyświetla wszystkie dostępne informacje"
+    echo -e "  --save-all               Zapisuje wszystkie wyniki do pliku"
+    echo
+    echo -e "${CYAN}INFORMACJE O SYSTEMIE:${RESET}"
+    echo -e "  --system-info            Wyświetla podstawowe informacje o systemie"
+    echo -e "  --packages               Wyświetla listę zainstalowanych pakietów"
+    echo -e "  --services               Wyświetla listę uruchomionych usług"
+    echo -e "  --ports                  Wyświetla listę otwartych portów"
+    echo -e "  --startup                Wyświetla listę programów uruchamianych przy starcie"
+    echo -e "  --recent-packages        Wyświetla ostatnio zainstalowane pakiety"
+    echo -e "  --repositories           Wyświetla skonfigurowane repozytoria"
+    echo
+    echo -e "${CYAN}ŚLEDZENIE ZMIAN:${RESET}"
+    echo -e "  --track-changes=DATA     Ustawia datę śledzenia zmian"
     echo -e "                           Przykłady:"
     echo -e "                           --track-changes=\"1 month ago\""
     echo -e "                           --track-changes=\"2023-01-15\""
-    echo -e "  --monthly-stats          Generuj statystyki miesięczne"
-    echo -e "  --monthly-report         Generuj szczegółowy raport miesięczny"
-    echo -e "  --monthly-visualize      Generuj wizualizację miesięcznych zmian"
-    echo -e "  --save-all               Zapisz wszystkie wyniki do pliku"
-    echo -e "  --help, -h               Wyświetl tę pomoc"
+    echo -e "  --config-changes         Wyświetla zmiany w plikach konfiguracyjnych"
+    echo -e "  --user-changes           Wyświetla zmiany w użytkownikach i grupach"
+    echo -e "  --binary-changes         Wyświetla zmiany w plikach binarnych"
+    echo -e "  --scheduled-tasks        Wyświetla zmiany w zaplanowanych zadaniach"
+    echo -e "  --network-changes        Wyświetla zmiany w konfiguracji sieci"
+    echo -e "  --system-timestamps      Wyświetla zmiany w kluczowych plikach systemowych"
     echo
-    echo -e "${GREEN}Przykłady:${RESET}"
-    echo -e "  sudo $0 --track-changes=\"7 days ago\""
-    echo -e "  sudo $0 --monthly-stats"
-    echo -e "  sudo $0 --save-all"
+    echo -e "${CYAN}RAPORTY MIESIĘCZNE:${RESET}"
+    echo -e "  --monthly-report         Generuje szczegółowy raport miesięczny"
+    echo -e "  --monthly-stats          Generuje statystyki miesięczne"
+    echo -e "  --monthly-visualize      Generuje wizualizację miesięcznych zmian"
     echo
+    echo -e "${CYAN}PRZYKŁADY UŻYCIA:${RESET}"
+    echo -e "  # Wyświetlenie podstawowych informacji o systemie:"
+    echo -e "  sudo $0 --system-info"
+    echo
+    echo -e "  # Wyświetlenie wszystkich informacji z śledzeniem zmian od tygodnia:"
+    echo -e "  sudo $0 --track-changes=\"1 week ago\" --all"
+    echo
+    echo -e "  # Wygenerowanie statystyk miesięcznych i zapisanie ich do pliku:"
+    echo -e "  sudo $0 --monthly-stats --save-all"
+    echo
+    echo -e "  # Sprawdzenie zmian w plikach konfiguracyjnych od konkretnej daty:"
+    echo -e "  sudo $0 --track-changes=\"2023-06-01\" --config-changes"
+    echo
+    echo -e "${CYAN}UWAGI:${RESET}"
+    echo -e "  - Niektóre funkcje wymagają uprawnień roota (sudo)."
+    echo -e "  - Aby wyświetlić zmiany, należy użyć opcji --track-changes wraz z odpowiednią datą."
+    echo -e "  - Można łączyć wiele opcji w jednym poleceniu."
+    echo -e "  - Wyniki można zapisać do pliku za pomocą opcji --save-all."
+    echo
+    echo -e "${BLUE}===========================================================${RESET}"
 }
 
 # Uruchom program
