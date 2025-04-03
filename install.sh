@@ -5,19 +5,6 @@ PROJECT_BASE_URL="https://raw.githubusercontent.com/DevOpsTerminal/hello/main"
 SCRIPT_NAME="hello.sh"
 CHECKSUM_FILE="checksums/checksums.sha256"
 
-# Funkcje logowania z kolorami
-log_error() {
-    echo -e "\e[31m[BŁĄD]\e[0m $1" >&2
-}
-
-log_success() {
-    echo -e "\e[32m[SUKCES]\e[0m $1"
-}
-
-log_info() {
-    echo -e "\e[34m[INFO]\e[0m $1"
-}
-
 # Funkcja pobierająca sumę kontrolną
 fetch_checksum() {
     local urls=(
@@ -26,6 +13,7 @@ fetch_checksum() {
     )
 
     for url in "${urls[@]}"; do
+        echo "Próba pobrania sumy kontrolnej z: $url" >&2
         local output=$(curl -sSL "$url" 2>/dev/null)
         local checksum=$(echo "$output" | grep -E "hello\.sh\s*$" | awk '{print $1}')
 
@@ -35,6 +23,7 @@ fetch_checksum() {
         fi
     done
 
+    echo "Nie znaleziono sumy kontrolnej" >&2
     return 1
 }
 
@@ -46,99 +35,75 @@ fetch_script() {
     )
 
     for url in "${urls[@]}"; do
+        echo "Próba pobrania skryptu z: $url" >&2
         if curl -sSL "$url" -o "${SCRIPT_NAME}" 2>/dev/null; then
             return 0
         fi
     done
 
+    echo "Nie udało się pobrać skryptu" >&2
     return 1
 }
 
-# Funkcja pobierająca i weryfikująca sumę kontrolną
+# Główna funkcja weryfikacji
 download_and_verify() {
-    local log_output=""
-    local error_output=""
-    local success=0
-
     # Pobierz sumę kontrolną
-    local remote_checksum
-    {
-        if ! remote_checksum=$(fetch_checksum); then
-            error_output+="Nie udało się pobrać sumy kontrolnej z żadnego źródła!\n"
-            success=1
-        fi
-    } 2>&1 | while read -r line; do
-        log_output+="$line\n"
-    done
+    local remote_checksum=$(fetch_checksum)
+    if [ $? -ne 0 ]; then
+        echo "Błąd pobierania sumy kontrolnej" >&2
+        return 1
+    fi
 
     # Usuń białe znaki z sumy kontrolnej
     remote_checksum=$(echo "$remote_checksum" | tr -d '[:space:]')
+    echo "Pobrana suma kontrolna: $remote_checksum" >&2
 
     # Pobierz skrypt
-    {
-        if ! fetch_script; then
-            error_output+="Nie udało się pobrać skryptu z żadnego źródła!\n"
-            success=1
-        fi
-    } 2>&1 | while read -r line; do
-        log_output+="$line\n"
-    done
+    if ! fetch_script; then
+        echo "Błąd pobierania skryptu" >&2
+        return 1
+    fi
 
     # Sprawdź sumę kontrolną
+    echo "Weryfikacja sumy kontrolnej..." >&2
     local local_checksum=$(sha256sum "${SCRIPT_NAME}" | awk '{print $1}')
 
-    # Dodaj informacje o sumach kontrolnych do logów
-    log_output+="Suma kontrolna zdalna:  $remote_checksum\n"
-    log_output+="Suma kontrolna lokalna: $local_checksum\n"
+    echo "Suma kontrolna zdalna:  $remote_checksum" >&2
+    echo "Suma kontrolna lokalna: $local_checksum" >&2
 
     # Porównaj sumy kontrolne
     if [ "$remote_checksum" != "$local_checksum" ]; then
-        error_output+="OSTRZEŻENIE: Suma kontrolna nie zgadza się!\n"
-        error_output+="Suma zdalna:  $remote_checksum\n"
-        error_output+="Suma lokalna: $local_checksum\n"
-        rm "${SCRIPT_NAME}"
-        success=1
+        echo "BŁĄD: Suma kontrolna nie zgadza się!" >&2
+        return 1
     fi
 
-    # Zwróć wyniki
-    echo -e "$log_output"
-    echo -e "$error_output" >&2
-    return $success
+    # Nadaj uprawnienia wykonania
+    chmod +x "${SCRIPT_NAME}"
+    echo "Suma kontrolna zweryfikowana poprawnie" >&2
+
+    # Uruchom skrypt
+    echo "Uruchamianie skryptu..." >&2
+    ./"${SCRIPT_NAME}"
 }
 
 # Główna logika
 main() {
-    local log_output=""
-    local error_output=""
-    local success=0
-
     # Sprawdź wymagane narzędzia
     for tool in curl sha256sum; do
         if ! command -v "$tool" &> /dev/null; then
-            error_output+="Wymagane narzędzie $tool nie jest zainstalowane!\n"
-            success=1
+            echo "Wymagane narzędzie $tool nie jest zainstalowane!" >&2
+            return 1
         fi
     done
 
     # Wykonaj pobieranie i weryfikację
-    if [ $success -eq 0 ]; then
-        {
-            if download_and_verify; then
-                log_output+="Instalacja zakończona sukcesem!\n"
-            else
-                error_output+="Instalacja nie powiodła się!\n"
-                success=1
-            fi
-        } 2>&1 | while read -r line; do
-            log_output+="$line\n"
-        done
+    if download_and_verify; then
+        echo "Instalacja zakończona sukcesem!" >&2
+        return 0
+    else
+        echo "Instalacja nie powiodła się!" >&2
+        return 1
     fi
-
-    # Wyświetl logi
-    echo -e "$log_output"
-    echo -e "$error_output" >&2
-
-    return $success
 }
 
 # Uruchom główną funkcję
