@@ -47,7 +47,8 @@ if [ -f "$MAIN_DIR/main.sh" ]; then
     echo "Dodawanie głównego kodu programu..."
     cat "$MAIN_DIR/main.sh" >> "$OUTPUT_FILE"
     # add date and time for generated file
-    date >> "$OUTPUT_FILE"
+    echo "" >> "$OUTPUT_FILE"
+    echo "# $(date)" >> "$OUTPUT_FILE"
 fi
 
 # Ustaw uprawnienia wykonywania
