@@ -59,7 +59,7 @@ fetch_script() {
 download_and_verify() {
     # Pobierz sumę kontrolną
     local remote_checksum
-    if ! remote_checksum=$(fetch_checksum); then
+    if ! remote_checksum=$(fetch_checksum 2>&1 | grep -v '\[INFO\]'); then
         log_error "Nie udało się pobrać sumy kontrolnej z żadnego źródła!"
         return 1
     fi
@@ -68,7 +68,7 @@ download_and_verify() {
     remote_checksum=$(echo "$remote_checksum" | tr -d '[:space:]')
 
     # Pobierz skrypt
-    if ! fetch_script; then
+    if ! fetch_script 2>&1 | grep -q '\[INFO\]'; then
         log_error "Nie udało się pobrać skryptu z żadnego źródła!"
         return 1
     fi
