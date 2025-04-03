@@ -1365,7 +1365,6 @@ main() {
 }
 
 # UWAGA: W tym skrócie pomijam pozostałe funkcje dla zwięzłości.
-# Powinieneś TUTAJ dodać WSZYSTKIE pozostałe funkcje z poprzedniego skryptu:
 # - detect_distro()
 # - get_installed_packages()
 # - get_running_services()
