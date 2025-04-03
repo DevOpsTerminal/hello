@@ -64,6 +64,9 @@ download_and_verify() {
         return 1
     fi
 
+    # Usuń białe znaki z sumy kontrolnej
+    remote_checksum=$(echo "$remote_checksum" | tr -d '[:space:]')
+
     # Pobierz skrypt
     if ! fetch_script; then
         log_error "Nie udało się pobrać skryptu z żadnego źródła!"
