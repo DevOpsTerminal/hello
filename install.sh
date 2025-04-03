@@ -1,11 +1,14 @@
 #!/bin/bash
 
-# Adres projektu i główny skrypt
-PROJECT_URL="https://raw.githubusercontent.com/DevOpsTerminal/hello/main"
+# Konfiguracja źródeł
+PROJECT_BASE_URL="https://raw.githubusercontent.com/DevOpsTerminal/hello/main"
 SCRIPT_NAME="hello.sh"
 CHECKSUM_NAME="checksums.sha256"
 
-# Funkcja do logowania z kolorami
+# Alternatywne źródło (opcjonalne)
+ALTERNATIVE_BASE_URL="https://hello.devopsterminal.com"
+
+# Funkcje logowania z kolorami
 log_error() {
     echo -e "\e[31m[BŁĄD]\e[0m $1" >&2
 }
@@ -18,20 +21,57 @@ log_info() {
     echo -e "\e[34m[INFO]\e[0m $1"
 }
 
+# Funkcja pobierająca sumę kontrolną
+fetch_checksum() {
+    local urls=(
+        "${PROJECT_BASE_URL}/${CHECKSUM_NAME}"
+        "${ALTERNATIVE_BASE_URL}/${CHECKSUM_NAME}"
+    )
+
+    for url in "${urls[@]}"; do
+        log_info "Próba pobrania sumy kontrolnej z: $url"
+        local checksum=$(curl -sSL "$url" 2>/dev/null | grep "${SCRIPT_NAME}" | awk '{print $1}')
+
+        if [ -n "$checksum" ]; then
+            echo "$checksum"
+            return 0
+        fi
+    done
+
+    return 1
+}
+
+# Funkcja pobierająca skrypt
+fetch_script() {
+    local urls=(
+        "${PROJECT_BASE_URL}/${SCRIPT_NAME}"
+        "${ALTERNATIVE_BASE_URL}/${SCRIPT_NAME}"
+    )
+
+    for url in "${urls[@]}"; do
+        log_info "Próba pobrania skryptu z: $url"
+        if curl -sSL "$url" -o "${SCRIPT_NAME}" 2>/dev/null; then
+            return 0
+        fi
+    done
+
+    return 1
+}
+
 # Funkcja pobierająca i weryfikująca sumę kontrolną
 download_and_verify() {
     # Pobierz sumę kontrolną
-    log_info "Pobieranie sumy kontrolnej..."
-    local remote_checksum=$(curl -sSL "${PROJECT_URL}/${CHECKSUM_NAME}" | grep "${SCRIPT_NAME}" | awk '{print $1}')
-
-    if [ -z "$remote_checksum" ]; then
-        log_error "Nie udało się pobrać sumy kontrolnej!"
+    local remote_checksum
+    if ! remote_checksum=$(fetch_checksum); then
+        log_error "Nie udało się pobrać sumy kontrolnej z żadnego źródła!"
         return 1
     fi
 
     # Pobierz skrypt
-    log_info "Pobieranie skryptu instalacyjnego..."
-    curl -sSL "${PROJECT_URL}/${SCRIPT_NAME}" > "${SCRIPT_NAME}"
+    if ! fetch_script; then
+        log_error "Nie udało się pobrać skryptu z żadnego źródła!"
+        return 1
+    fi
 
     # Sprawdź sumę kontrolną
     log_info "Weryfikacja sumy kontrolnej..."
