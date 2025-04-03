@@ -81,9 +81,9 @@ download_and_verify() {
     chmod +x "${SCRIPT_NAME}"
     echo "Suma kontrolna zweryfikowana poprawnie" >&2
 
-    # Uruchom skrypt
-    echo "Uruchamianie skryptu..." >&2
-    ./"${SCRIPT_NAME}"
+    # Uruchom skrypt z opcją help
+    echo "Uruchamianie skryptu z opcją help..." >&2
+    ./"${SCRIPT_NAME}" help
 }
 
 # Główna logika
@@ -96,9 +96,9 @@ main() {
         fi
     done
 
-    # Wykonaj pobieranie i weryfikację
+    # Wykonaj pobieranie, weryfikację i uruchomienie z help
     if download_and_verify; then
-        echo "Instalacja zakończona sukcesem!" >&2
+        echo "Instalacja i weryfikacja zakończone sukcesem!" >&2
         return 0
     else
         echo "Instalacja nie powiodła się!" >&2
