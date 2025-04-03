@@ -10,11 +10,63 @@ RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[0;33m'
 BLUE='\033[0;34m'
+PURPLE='\033[0;35m'
 CYAN='\033[0;36m'
 RESET='\033[0m'
 
 # Domyślna data początku śledzenia zmian (ostatnie 7 dni)
 DEFAULT_SINCE_DATE=$(date -d "7 days ago" +"%Y-%m-%d")
+
+# Funkcja do wyświetlania nagłówków
+print_header() {
+    echo -e "\n${BLUE}========== $1 ==========${RESET}\n"
+}
+
+# Funkcja do sprawdzania czasów modyfikacji plików systemowych
+check_system_timestamps() {
+    print_header "Czasy modyfikacji kluczowych plików systemowych"
+
+    if [ "$TRACK_CHANGES" = true ]; then
+        echo -e "${CYAN}Kluczowe pliki systemowe zmienione po $SINCE_DATE:${RESET}\n"
+
+        # Lista kluczowych katalogów i plików do sprawdzenia
+        system_files=(
+            "/boot"
+            "/etc/fstab"
+            "/etc/hosts"
+            "/etc/resolv.conf"
+            "/etc/ssh/sshd_config"
+            "/etc/pam.d"
+            "/etc/security"
+            "/etc/sudoers"
+            "/etc/sudoers.d"
+            "/etc/modules"
+            "/etc/modprobe.d"
+            "/etc/sysctl.conf"
+            "/etc/sysctl.d"
+            "/etc/default"
+            "/lib/modules"
+        )
+
+        for file in "${system_files[@]}"; do
+            if [ -e "$file" ]; then
+                if [ -d "$file" ]; then
+                    # Dla katalogów sprawdź rekursywnie pliki
+                    find "$file" -type f -newermt "$SINCE_DATE" 2>/dev/null | while read -r changed_file; do
+                        mod_date=$(stat -c '%y' "$changed_file" | cut -d. -f1)
+                        echo "$mod_date: $changed_file"
+                    done
+                elif [ -f "$file" ] && [ "$(stat -c '%Y' "$file")" -gt "$(date -d "$SINCE_DATE" +%s)" ]; then
+                    # Dla pojedynczych plików
+                    mod_date=$(stat -c '%y' "$file" | cut -d. -f1)
+                    echo "$mod_date: $file"
+                fi
+            fi
+        done
+    else
+        echo -e "${RED}Śledzenie zmian nie jest włączone. Użyj opcji 'Ustaw datę śledzenia zmian'${RESET}"
+    fi
+}
 
 
 visualize_monthly_changes() {
@@ -475,74 +527,6 @@ generate_monthly_reports() {
 
         echo -e "\n"
     done
-}#!/bin/bash
-
-# Linux Software Finder
-# Skrypt do wyszukiwania zainstalowanego oprogramowania i usług na systemach Linux
-# Działa na różnych dystrybucjach (Ubuntu, Debian, Fedora, itp.)
-# Umożliwia śledzenie zmian w systemie od określonej daty
-
-# Ustawienie kolorów dla lepszej czytelności
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[0;33m'
-BLUE='\033[0;34m'
-PURPLE='\033[0;35m'
-CYAN='\033[0;36m'
-RESET='\033[0m'
-
-# Domyślna data początku śledzenia zmian (ostatnie 7 dni)
-DEFAULT_SINCE_DATE=$(date -d "7 days ago" +"%Y-%m-%d")
-
-# Funkcja do wyświetlania nagłówków
-print_header() {
-    echo -e "\n${BLUE}========== $1 ==========${RESET}\n"
-}
-
-# Funkcja do sprawdzania czasów modyfikacji plików systemowych
-check_system_timestamps() {
-    print_header "Czasy modyfikacji kluczowych plików systemowych"
-
-    if [ "$TRACK_CHANGES" = true ]; then
-        echo -e "${CYAN}Kluczowe pliki systemowe zmienione po $SINCE_DATE:${RESET}\n"
-
-        # Lista kluczowych katalogów i plików do sprawdzenia
-        system_files=(
-            "/boot"
-            "/etc/fstab"
-            "/etc/hosts"
-            "/etc/resolv.conf"
-            "/etc/ssh/sshd_config"
-            "/etc/pam.d"
-            "/etc/security"
-            "/etc/sudoers"
-            "/etc/sudoers.d"
-            "/etc/modules"
-            "/etc/modprobe.d"
-            "/etc/sysctl.conf"
-            "/etc/sysctl.d"
-            "/etc/default"
-            "/lib/modules"
-        )
-
-        for file in "${system_files[@]}"; do
-            if [ -e "$file" ]; then
-                if [ -d "$file" ]; then
-                    # Dla katalogów sprawdź rekursywnie pliki
-                    find "$file" -type f -newermt "$SINCE_DATE" 2>/dev/null | while read changed_file; do
-                        mod_date=$(stat -c '%y' "$changed_file" | cut -d. -f1)
-                        echo "$mod_date: $changed_file"
-                    done
-                elif [ -f "$file" ] && [ "$(stat -c '%Y' "$file")" -gt "$(date -d "$SINCE_DATE" +%s)" ]; then
-                    # Dla pojedynczych plików
-                    mod_date=$(stat -c '%y' "$file" | cut -d. -f1)
-                    echo "$mod_date: $file"
-                fi
-            fi
-        done
-    else
-        echo -e "${RED}Śledzenie zmian nie jest włączone. Użyj opcji 'Ustaw datę śledzenia zmian'${RESET}"
-    fi
 }
 
 # Funkcja do sprawdzania zmian w konfiguracji sieci
@@ -563,7 +547,7 @@ check_network_changes() {
         for dir in "${network_dirs[@]}"; do
             if [ -d "$dir" ]; then
                 echo -e "${YELLOW}Zmiany w $dir:${RESET}"
-                find "$dir" -type f -newermt "$SINCE_DATE" 2>/dev/null | while read file; do
+                find "$dir" -type f -newermt "$SINCE_DATE" 2>/dev/null | while read -r file; do
                     mod_date=$(stat -c '%y' "$file" | cut -d. -f1)
                     echo "$mod_date: $file"
                 done
@@ -575,7 +559,7 @@ check_network_changes() {
             echo -e "\n${YELLOW}Zmiana w /etc/resolv.conf:${RESET}"
             mod_date=$(stat -c '%y' "/etc/resolv.conf" | cut -d. -f1)
             echo "$mod_date: /etc/resolv.conf"
-            cat "/etc/resolv.conf" | grep -v "^#" | grep -v "^$"
+            grep -v "^#" "/etc/resolv.conf" | grep -v "^$"
         fi
 
         # Sprawdź plik hosts
@@ -583,7 +567,7 @@ check_network_changes() {
             echo -e "\n${YELLOW}Zmiana w /etc/hosts:${RESET}"
             mod_date=$(stat -c '%y' "/etc/hosts" | cut -d. -f1)
             echo "$mod_date: /etc/hosts"
-            cat "/etc/hosts" | grep -v "^#" | grep -v "^$"
+            grep -v "^#" "/etc/hosts" | grep -v "^$"
         fi
     else
         echo -e "${RED}Śledzenie zmian nie jest włączone. Użyj opcji 'Ustaw datę śledzenia zmian'${RESET}"
@@ -603,8 +587,11 @@ date_to_timestamp() {
 # Funkcja do sprawdzania, czy data jest po dacie początku śledzenia zmian
 is_after_since_date() {
     local file_date="$1"
-    local since_timestamp=$(date_to_timestamp "$SINCE_DATE")
-    local file_timestamp=$(date_to_timestamp "$file_date")
+    local since_timestamp
+    local file_timestamp
+
+    since_timestamp=$(date_to_timestamp "$SINCE_DATE")
+    file_timestamp=$(date_to_timestamp "$file_date")
 
     if [ "$file_timestamp" -ge "$since_timestamp" ]; then
         return 0  # prawda
@@ -618,10 +605,13 @@ is_date_between() {
     local check_date="$1"
     local start_date="$2"
     local end_date="$3"
+    local check_timestamp
+    local start_timestamp
+    local end_timestamp
 
-    local check_timestamp=$(date_to_timestamp "$check_date")
-    local start_timestamp=$(date_to_timestamp "$start_date")
-    local end_timestamp=$(date_to_timestamp "$end_date")
+    check_timestamp=$(date_to_timestamp "$check_date")
+    start_timestamp=$(date_to_timestamp "$start_date")
+    end_timestamp=$(date_to_timestamp "$end_date")
 
     if [ "$check_timestamp" -ge "$start_timestamp" ] && [ "$check_timestamp" -lt "$end_timestamp" ]; then
         return 0  # prawda
@@ -633,9 +623,11 @@ is_date_between() {
 # Wykryj dystrybucję
 detect_distro() {
     if [ -f /etc/os-release ]; then
+        # shellcheck source=/dev/null
         . /etc/os-release
         echo "$NAME"
     elif [ -f /etc/lsb-release ]; then
+        # shellcheck source=/dev/null
         . /etc/lsb-release
         echo "$DISTRIB_ID"
     elif [ -f /etc/debian_version ]; then
@@ -660,15 +652,15 @@ get_installed_packages() {
         if [ "$TRACK_CHANGES" = true ]; then
             echo -e "\n${CYAN}Pakiety zainstalowane po $SINCE_DATE:${RESET}"
             if [ -f /var/log/dpkg.log ]; then
-                grep " install " /var/log/dpkg.log | grep -v "status installed" | while read line; do
-                    log_date=$(echo $line | awk '{print $1}')
+                grep " install " /var/log/dpkg.log | grep -v "status installed" | while read -r line; do
+                    log_date=$(echo "$line" | awk '{print $1}')
                     if is_after_since_date "$log_date"; then
-                        package=$(echo $line | awk '{print $4}')
+                        package=$(echo "$line" | awk '{print $4}')
                         echo "$log_date: $package"
                     fi
                 done
             else
-                find /var/lib/dpkg/info/ -name "*.list" -newer $(date -d "$SINCE_DATE" +%Y%m%d) | sed 's/.*\///g' | sed 's/\.list$//g'
+                find /var/lib/dpkg/info/ -name "*.list" -newer "$(date -d "$SINCE_DATE" +%Y%m%d)" | sed 's/.*\///g' | sed 's/\.list$//g'
             fi
         fi
     elif command_exists rpm; then
@@ -678,18 +670,18 @@ get_installed_packages() {
         if [ "$TRACK_CHANGES" = true ]; then
             echo -e "\n${CYAN}Pakiety zainstalowane po $SINCE_DATE:${RESET}"
             if [ -f /var/log/dnf.log ]; then
-                grep -i "Installed" /var/log/dnf.log | while read line; do
-                    log_date=$(echo $line | awk '{print $1 " " $2}' | sed 's/:$//')
+                grep -i "Installed" /var/log/dnf.log | while read -r line; do
+                    log_date=$(echo "$line" | awk '{print $1 " " $2}' | sed 's/:$//')
                     if is_after_since_date "$log_date"; then
-                        package=$(echo $line | awk '{print $5}' | sed 's/:.*//')
+                        package=$(echo "$line" | awk '{print $5}' | sed 's/:.*//')
                         echo "$log_date: $package"
                     fi
                 done
             elif [ -f /var/log/yum.log ]; then
-                grep "Installed" /var/log/yum.log | while read line; do
-                    log_date=$(echo $line | awk '{print $1 " " $2}')
+                grep "Installed" /var/log/yum.log | while read -r line; do
+                    log_date=$(echo "$line" | awk '{print $1 " " $2}')
                     if is_after_since_date "$log_date"; then
-                        package=$(echo $line | awk '{print $5}')
+                        package=$(echo "$line" | awk '{print $5}')
                         echo "$log_date: $package"
                     fi
                 done
@@ -702,11 +694,11 @@ get_installed_packages() {
         if [ "$TRACK_CHANGES" = true ]; then
             echo -e "\n${CYAN}Pakiety zainstalowane po $SINCE_DATE:${RESET}"
             since_timestamp=$(date -d "$SINCE_DATE" +%s)
-            grep "\[ALPM\] installed" /var/log/pacman.log | while read line; do
-                log_date=$(echo $line | cut -d[ -f2 | cut -d] -f1)
+            grep "\[ALPM\] installed" /var/log/pacman.log | while read -r line; do
+                log_date=$(echo "$line" | cut -d[ -f2 | cut -d] -f1)
                 log_timestamp=$(date -d "$log_date" +%s 2>/dev/null)
                 if [ -n "$log_timestamp" ] && [ "$log_timestamp" -ge "$since_timestamp" ]; then
-                    package=$(echo $line | sed 's/.*installed \(.*\) (.*/\1/')
+                    package=$(echo "$line" | sed 's/.*installed \(.*\) (.*/\1/')
                     echo "$log_date: $package"
                 fi
             done
@@ -728,7 +720,7 @@ get_running_services() {
             echo -e "\n${CYAN}Usługi zmienione po $SINCE_DATE:${RESET}"
             systemd_services_dir="/etc/systemd/system"
             if [ -d "$systemd_services_dir" ]; then
-                find "$systemd_services_dir" -name "*.service" -type f -newermt "$SINCE_DATE" | while read file; do
+                find "$systemd_services_dir" -name "*.service" -type f -newermt "$SINCE_DATE" | while read -r file; do
                     service_name=$(basename "$file")
                     mod_date=$(stat -c '%y' "$file" | cut -d. -f1)
                     echo "$mod_date: $service_name (zmodyfikowana)"
@@ -749,7 +741,7 @@ get_running_services() {
             echo -e "\n${CYAN}Usługi zmienione po $SINCE_DATE:${RESET}"
             initd_dir="/etc/init.d"
             if [ -d "$initd_dir" ]; then
-                find "$initd_dir" -type f -newermt "$SINCE_DATE" | while read file; do
+                find "$initd_dir" -type f -newermt "$SINCE_DATE" | while read -r file; do
                     service_name=$(basename "$file")
                     mod_date=$(stat -c '%y' "$file" | cut -d. -f1)
                     echo "$mod_date: $service_name (zmodyfikowana)"
@@ -807,7 +799,7 @@ check_startup_programs() {
             echo -e "\n${CYAN}Usługi systemd zmienione po $SINCE_DATE:${RESET}"
             systemd_dir="/etc/systemd/system"
             if [ -d "$systemd_dir" ]; then
-                find "$systemd_dir" -name "*.service" -type f -newermt "$SINCE_DATE" | while read file; do
+                find "$systemd_dir" -name "*.service" -type f -newermt "$SINCE_DATE" | while read -r file; do
                     mod_date=$(stat -c '%y' "$file" | cut -d. -f1)
                     service_name=$(basename "$file")
                     service_state=$(systemctl is-enabled "$service_name" 2>/dev/null || echo "unknown")
@@ -824,7 +816,7 @@ check_startup_programs() {
 
         if [ "$TRACK_CHANGES" = true ]; then
             echo -e "\n${CYAN}Programy startowe XDG zmienione po $SINCE_DATE:${RESET}"
-            find /etc/xdg/autostart -type f -newermt "$SINCE_DATE" | while read file; do
+            find /etc/xdg/autostart -type f -newermt "$SINCE_DATE" | while read -r file; do
                 mod_date=$(stat -c '%y' "$file" | cut -d. -f1)
                 echo "$mod_date: $file"
             done
@@ -834,7 +826,7 @@ check_startup_programs() {
     # Sprawdź rc.local
     if [ -f /etc/rc.local ]; then
         echo -e "\n${GREEN}Zawartość /etc/rc.local:${RESET}"
-        cat /etc/rc.local | grep -v "^#" | grep -v "^$"
+        grep -v "^#" /etc/rc.local | grep -v "^$"
 
         if [ "$TRACK_CHANGES" = true ] && [ "$(stat -c '%Y' /etc/rc.local)" -gt "$(date -d "$SINCE_DATE" +%s)" ]; then
             echo -e "\n${CYAN}Plik /etc/rc.local został zmodyfikowany:${RESET}"
@@ -857,7 +849,7 @@ check_config_changes() {
         for dir in "${config_dirs[@]}"; do
             if [ -d "$dir" ]; then
                 echo -e "\n${YELLOW}Zmiany w $dir:${RESET}"
-                find "$dir" -type f -newermt "$SINCE_DATE" 2>/dev/null | sort | while read file; do
+                find "$dir" -type f -newermt "$SINCE_DATE" 2>/dev/null | sort | while read -r file; do
                     mod_date=$(stat -c '%y' "$file" | cut -d. -f1)
                     echo "$mod_date: $file"
                 done
@@ -876,6 +868,7 @@ get_system_info() {
     echo -e "${GREEN}Dystrybucja:${RESET} $DISTRO"
 
     if [ -f /etc/os-release ]; then
+        # shellcheck source=/dev/null
         . /etc/os-release
         echo -e "${GREEN}Wersja:${RESET} $VERSION_ID"
     fi
@@ -892,7 +885,7 @@ get_system_info() {
         echo -e "${GREEN}Przybliżona data instalacji:${RESET} $install_date"
     else
         # Alternatywna metoda określania daty instalacji
-        oldest_pkg_date=$(find /var/lib/dpkg/info -type f -name "*.list" 2>/dev/null | xargs ls -tr 2>/dev/null | head -n 1 | xargs stat -c '%y' 2>/dev/null | cut -d. -f1)
+        oldest_pkg_date=$(find /var/lib/dpkg/info -type f -name "*.list" 2>/dev/null | xargs -r ls -tr 2>/dev/null | head -n 1 | xargs -r stat -c '%y' 2>/dev/null | cut -d. -f1)
         if [ -n "$oldest_pkg_date" ]; then
             echo -e "${GREEN}Przybliżona data instalacji (na podstawie pakietów):${RESET} $oldest_pkg_date"
         fi
@@ -933,14 +926,14 @@ check_repositories() {
         echo -e "${GREEN}Repozytoria APT (Debian/Ubuntu):${RESET}"
         ls -l /etc/apt/sources.list.d/
         echo -e "\n${GREEN}Główne repozytoria:${RESET}"
-        cat /etc/apt/sources.list | grep -v "^#" | grep -v "^$"
+        grep -v "^#" /etc/apt/sources.list | grep -v "^$"
 
         if [ "$TRACK_CHANGES" = true ]; then
             echo -e "\n${CYAN}Repozytoria dodane/zmienione po $SINCE_DATE:${RESET}"
-            find /etc/apt/sources.list.d -type f -newermt "$SINCE_DATE" | while read file; do
+            find /etc/apt/sources.list.d -type f -newermt "$SINCE_DATE" | while read -r file; do
                 mod_date=$(stat -c '%y' "$file" | cut -d. -f1)
                 echo "$mod_date: $file"
-                cat "$file" | grep -v "^#" | grep -v "^$"
+                grep -v "^#" "$file" | grep -v "^$"
             done
 
             # Sprawdź główny plik sources.list
@@ -956,10 +949,10 @@ check_repositories() {
 
         if [ "$TRACK_CHANGES" = true ]; then
             echo -e "\n${CYAN}Repozytoria dodane/zmienione po $SINCE_DATE:${RESET}"
-            find /etc/yum.repos.d -type f -newermt "$SINCE_DATE" | while read file; do
+            find /etc/yum.repos.d -type f -newermt "$SINCE_DATE" | while read -r file; do
                 mod_date=$(stat -c '%y' "$file" | cut -d. -f1)
                 echo "$mod_date: $file"
-                cat "$file" | grep -v "^#" | grep -v "^$" | head -n 10
+                grep -v "^#" "$file" | grep -v "^$" | head -n 10
                 echo "..."
             done
         fi
@@ -1116,7 +1109,7 @@ track_binary_changes() {
         for dir in "${bin_dirs[@]}"; do
             if [ -d "$dir" ]; then
                 echo -e "\n${YELLOW}Zmiany w $dir:${RESET}"
-                find "$dir" -type f -newermt "$SINCE_DATE" -executable | while read file; do
+                find "$dir" -type f -newermt "$SINCE_DATE" -executable | while read -r file; do
                     mod_date=$(stat -c '%y' "$file" | cut -d. -f1)
                     echo "$mod_date: $file"
                 done

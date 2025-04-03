@@ -2,6 +2,94 @@
 
 ![DevOpsTerminal Logo](https://github.com/DevOpsTerminal/hello/raw/main/assets/logo.png)
 
+# Linux Software Finder
+
+Skrypt do wyszukiwania zainstalowanego oprogramowania i usług na systemach Linux. Działa na różnych dystrybucjach (Ubuntu, Debian, Fedora, itp.) i umożliwia śledzenie zmian w systemie od określonej daty.
+
+## Struktura projektu
+
+Projekt został podzielony na wiele plików dla łatwiejszej modyfikacji i rozszerzalności:
+
+```
+linux_software_finder/
+├── src/
+│   ├── functions/        # Katalog zawierający pliki z poszczególnymi funkcjami
+│   │   ├── command_exists.sh
+│   │   ├── date_timestamp.sh
+│   │   ├── detect_distro.sh
+│   │   └── ...
+│   ├── main/             # Katalog z głównymi plikami programu
+│       ├── colors.sh     # Konfiguracja kolorów
+│       ├── defaults.sh   # Domyślne wartości zmiennych
+│       └── main.sh       # Główna funkcja programu
+├── linux_software_finder.sh  # Finalny skrypt (wygenerowany)
+├── create_structure.sh       # Skrypt tworzący strukturę folderów
+└── merge_files.sh           # Skrypt łączący pliki w jeden skrypt wykonawczy
+```
+
+## Jak korzystać
+
+### Rozwój i modyfikacja
+
+1. Utwórz strukturę katalogów używając `create_structure.sh`:
+   ```
+   ./create_structure.sh
+   ```
+
+2. Modyfikuj poszczególne pliki z funkcjami w katalogu `src/functions/` lub pliki konfiguracyjne w `src/main/`.
+
+3. Po zakończeniu modyfikacji, użyj skryptu `merge_files.sh` aby połączyć wszystkie pliki w jeden wykonawczy skrypt:
+   ```
+   ./merge_files.sh
+   ```
+
+4. Wygenerowany skrypt `linux_software_finder.sh` jest gotowy do uruchomienia:
+   ```
+   ./linux_software_finder.sh
+   ```
+
+### Używanie finalnego skryptu
+
+Uruchom skrypt jako użytkownik root, aby uzyskać pełny dostęp do informacji o systemie:
+
+```
+sudo ./linux_software_finder.sh
+```
+
+Po uruchomieniu skryptu zostanie wyświetlone menu główne z różnymi opcjami:
+
+- Informacje o systemie
+- Zainstalowane pakiety
+- Uruchomione usługi
+- Otwarte porty
+- Programy startowe
+- i wiele innych...
+
+## Śledzenie zmian
+
+Skrypt umożliwia śledzenie zmian w systemie od określonej daty:
+
+1. Wybierz opcję "Ustaw datę śledzenia zmian" z menu głównego
+2. Wprowadź datę w jednym z następujących formatów:
+   - YYYY-MM-DD (np. 2023-01-15)
+   - 'X days ago' (np. '30 days ago')
+   - 'last month', 'last week', 'yesterday'
+
+Po ustawieniu daty śledzenia, dodatkowe opcje związane ze zmianami staną się dostępne.
+
+## Generowanie raportów
+
+Skrypt może generować raporty i zapisywać wyniki do pliku:
+
+1. Wybierz opcję "Zapisz wszystko do pliku" z menu głównego
+2. Raport zostanie zapisany w bieżącym katalogu z nazwą zawierającą bieżącą datę i czas
+
+## Wymagania
+
+- System Linux (Ubuntu, Debian, Fedora, CentOS, Arch Linux, itp.)
+- Bash (wersja 4.0+)
+- Podstawowe narzędzia systemowe (find, grep, awk, sed, itp.)
+
 ## 🌟 Przegląd
 
 **Hello System Scanner** (`hello.sh`) to zaawansowane narzędzie diagnostyczne dla systemów Linux, które umożliwia kompleksową analizę i śledzenie zmian w systemie. Skrypt zapewnia administratorom, specjalistom DevOps i entuzjastom Linuksa pełny wgląd w instalowane oprogramowanie, uruchomione usługi oraz zmiany systemowe w czasie.
@@ -118,6 +206,22 @@ Luty 2023       12      3      24           0           1
 Marzec 2023     28      5      32           1           2
 ```
 
+## Examples
+
+### 16) Raport zmian miesięcznych (ostatnie 12 miesięcy)
+
+![16.png](img/16.png)
+
+### 17) Statystyki miesięczne (ostatnie 12 miesięcy)
+
+![17.png](img/18.png)
+
+
+### 18) Wizualizacja zmian miesięcznych
+
+![18.png](img/17.png)
+
+
 ## 🔧 Opcje zaawansowane
 
 | Opcja                      | Opis                                            |
@@ -189,6 +293,47 @@ Jesteśmy otwarci na współpracę! Jeśli chcesz przyczynić się do rozwoju pr
 3. Zatwierdź swoje zmiany (`git commit -m 'Add some AmazingFeature'`)
 4. Wypchnij do gałęzi (`git push origin feature/AmazingFeature`)
 5. Otwórz Pull Request
+
+
+Poniżej znajduje się lista wszystkich plików w projekcie Linux Software Finder:
+
+### Pliki główne:
+1. `linux_software_finder.sh` - finalny skrypt (wygenerowany)
+2. `create_structure.sh` - skrypt tworzący strukturę folderów
+3. `merge_files.sh` - skrypt łączący pliki w jeden skrypt wykonawczy
+4. `README.md` - dokumentacja projektu
+
+### Katalog src/main/:
+1. `src/main/colors.sh` - definicje kolorów dla interfejsu
+2. `src/main/defaults.sh` - domyślne wartości zmiennych
+3. `src/main/main.sh` - główna funkcja programu
+
+### Katalog src/functions/:
+1. `src/functions/print_header.sh` - funkcja wyświetlająca nagłówki
+2. `src/functions/command_exists.sh` - sprawdzanie dostępności polecenia
+3. `src/functions/date_timestamp.sh` - funkcje obsługi dat i czasów
+4. `src/functions/detect_distro.sh` - wykrywanie dystrybucji Linux
+5. `src/functions/get_system_info.sh` - pobieranie informacji o systemie
+6. `src/functions/get_installed_packages.sh` - pobieranie listy zainstalowanych pakietów
+7. `src/functions/get_running_services.sh` - pobieranie listy uruchomionych usług
+8. `src/functions/check_open_ports.sh` - sprawdzanie otwartych portów
+9. `src/functions/check_startup_programs.sh` - sprawdzanie programów startowych
+10. `src/functions/check_config_changes.sh` - sprawdzanie zmian w plikach konfiguracyjnych
+11. `src/functions/find_recent_packages.sh` - znajdowanie ostatnio zainstalowanych pakietów
+12. `src/functions/check_repositories.sh` - sprawdzanie repozytoriów
+13. `src/functions/track_user_changes.sh` - śledzenie zmian w użytkownikach i grupach
+14. `src/functions/track_binary_changes.sh` - śledzenie zmian w plikach binarnych
+15. `src/functions/track_scheduled_tasks.sh` - śledzenie zmian w zadaniach cron
+16. `src/functions/check_network_changes.sh` - sprawdzanie zmian w konfiguracji sieci
+17. `src/functions/check_system_timestamps.sh` - sprawdzanie czasów modyfikacji plików systemowych
+18. `src/functions/visualize_monthly_changes.sh` - wizualizacja zmian miesięcznych
+19. `src/functions/generate_monthly_stats.sh` - generowanie statystyk miesięcznych
+20. `src/functions/generate_monthly_reports.sh` - generowanie raportów miesięcznych
+21. `src/functions/save_results.sh` - zapisywanie wyników do pliku
+22. `src/functions/set_tracking_date.sh` - ustawianie daty śledzenia zmian
+
+Ta struktura zapewnia modułową organizację kodu, gdzie każda funkcja jest w osobnym pliku, co ułatwia utrzymanie i rozwijanie projektu.
+
 
 ---
 

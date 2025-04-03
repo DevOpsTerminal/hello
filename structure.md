@@ -1,0 +1,23 @@
+src/
+├── print_header.sh
+├── command_exists.sh
+├── date_timestamp.sh
+├── detect_distro.sh
+├── get_system_info.sh
+├── get_installed_packages.sh
+├── get_running_services.sh
+├── check_open_ports.sh
+├── check_startup_programs.sh
+├── check_config_changes.sh
+├── find_recent_packages.sh
+├── check_repositories.sh
+├── track_user_changes.sh
+├── track_binary_changes.sh
+├── track_scheduled_tasks.sh
+├── check_network_changes.sh
+├── check_system_timestamps.sh
+├── visualize_monthly_changes.sh
+├── generate_monthly_stats.sh
+├── generate_monthly_reports.sh
+├── save_results.sh
+└── set_tracking_date.sh

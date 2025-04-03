@@ -2,6 +2,47 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.2] - 2025-04-03
+
+### Added
+- Changes in img/16.png
+- Changes in img/17.png
+- Changes in img/18.png
+- Changes in scripts/changelog.py
+- Changes in scripts/git.sh
+- Changes in scripts/merge.sh
+- Changes in scripts/start.sh
+- Changes in scripts/structure.sh
+- Changes in src/check_config_changes.sh
+- Changes in src/check_network_changes.sh
+- Changes in src/check_open_ports.sh
+- Changes in src/check_repositories.sh
+- Changes in src/check_startup_programs.sh
+- Changes in src/check_system_timestamps.sh
+- Changes in src/colors.sh
+- Changes in src/command_exists.sh
+- Changes in src/date_timestamp.sh
+- Changes in src/defaults.sh
+- Changes in src/detect_distro.sh
+- Changes in src/find_recent_packages.sh
+- Changes in src/generate_monthly_reports.sh
+- Changes in src/generate_monthly_stats.sh
+- Changes in src/get_installed_packages.sh
+- Changes in src/get_running_services.sh
+- Changes in src/get_system_info.sh
+- Changes in src/main.sh
+- Changes in src/print_header.sh
+- Changes in src/save_results.sh
+- Changes in src/set_tracking_date.sh
+- Changes in src/track_binary_changes.sh
+- Changes in src/track_scheduled_tasks.sh
+- Changes in src/track_user_changes.sh
+- Changes in src/visualize_monthly_changes.sh
+- Changes in structure.md
+
+### Removed
+- Changes in init.sh
+
 ## [0.1.1] - 2025-04-03
 
 ### Added
