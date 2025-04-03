@@ -27,7 +27,7 @@ fetch_checksum() {
 
     for url in "${urls[@]}"; do
         log_info "Próba pobrania sumy kontrolnej z: $url"
-        local checksum=$(curl -sSL "$url" 2>/dev/null | grep "${SCRIPT_NAME}" | awk '{print $1}')
+        local checksum=$(curl -sSL "$url" 2>/dev/null | grep -E "hello\.sh\s*$" | awk '{print $1}')
 
         if [ -n "$checksum" ]; then
             echo "$checksum"
@@ -76,6 +76,10 @@ download_and_verify() {
     # Sprawdź sumę kontrolną
     log_info "Weryfikacja sumy kontrolnej..."
     local local_checksum=$(sha256sum "${SCRIPT_NAME}" | awk '{print $1}')
+
+    # Debugowanie
+    log_info "Suma kontrolna zdalna:  $remote_checksum"
+    log_info "Suma kontrolna lokalna: $local_checksum"
 
     if [ "$remote_checksum" != "$local_checksum" ]; then
         log_error "OSTRZEŻENIE: Suma kontrolna nie zgadza się!"
