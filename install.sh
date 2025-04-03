@@ -81,9 +81,9 @@ download_and_verify() {
     chmod +x "${SCRIPT_NAME}"
     echo "Suma kontrolna zweryfikowana poprawnie" >&2
 
-    # Uruchom skrypt z opcją help
-    echo "Uruchamianie skryptu z opcją help..." >&2
-    ./"${SCRIPT_NAME}" help
+    # Uruchom skrypt
+    echo "Uruchamianie skryptu..." >&2
+    ./"${SCRIPT_NAME}"
 }
 
 # Główna logika

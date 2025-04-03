@@ -821,8 +821,86 @@
                 <div class="terminal-path">~/DevOpsTerminal</div>
             </div>
             <pre><code><span class="prompt">user@server:~$</span> <span class="command">wget -O install.sh https://raw.githubusercontent.com/DevOpsTerminal/hello/main/install.sh && bash install.sh</span>
-            <pre><code><span class="prompt">user@server:~$</span> <span class="command"># OR: </span>
-            <pre><code><span class="prompt">user@server:~$</span> <span class="command">wget -O install.sh https://raw.githubusercontent.com/DevOpsTerminal/hello/main/install.sh && bash install.sh</span>
+<!--            <pre><code><span class="prompt">user@server:~$</span> <span class="command"># OR: </span>-->
+HTTP request sent, awaiting response... 200 OK
+Length: 2888 (2.8K) [text/plain]
+Saving to: ‘install.sh’
+
+install.sh                               100%[==================================================================================>]   2.82K  --.-KB/s    in 0s
+
+2025-04-03 11:39:31 (44.9 MB/s) - ‘install.sh’ saved [2888/2888]
+
+Próba pobrania sumy kontrolnej z: https://raw.githubusercontent.com/DevOpsTerminal/hello/main/checksums/checksums.sha256
+Pobrana suma kontrolna: da4b0764b7ed89fb90d6947a435e339fab378b484c1b94c132a347c04cd729e6
+Próba pobrania skryptu z: https://raw.githubusercontent.com/DevOpsTerminal/hello/main/hello.sh
+Weryfikacja sumy kontrolnej...
+Suma kontrolna zdalna:  da4b0764b7ed89fb90d6947a435e339fab378b484c1b94c132a347c04cd729e6
+Suma kontrolna lokalna: da4b0764b7ed89fb90d6947a435e339fab378b484c1b94c132a347c04cd729e6
+Suma kontrolna zweryfikowana poprawnie
+Uruchamianie skryptu...
+===========================================================
+hello .sh - Linux Software Finder - narzędzie do analizy systemu
+===========================================================
+Wersja 1.0
+Ten skrypt identyfikuje zainstalowane oprogramowanie i usługi w systemie Linux oraz umożliwia śledzenie zmian od określonej daty.
+
+SPOSÓB UŻYCIA:
+  ./hello.sh [OPCJE]
+
+PODSTAWOWE OPCJE:
+  --help, -h               Wyświetla tę pomoc
+  --version                Wyświetla informacje o wersji programu
+  --all                    Wyświetla wszystkie dostępne informacje
+  --save-all               Zapisuje wszystkie wyniki do pliku
+
+INFORMACJE O SYSTEMIE:
+  --system-info            Wyświetla podstawowe informacje o systemie
+  --packages               Wyświetla listę zainstalowanych pakietów
+  --services               Wyświetla listę uruchomionych usług
+  --ports                  Wyświetla listę otwartych portów
+  --startup                Wyświetla listę programów uruchamianych przy starcie
+  --recent-packages        Wyświetla ostatnio zainstalowane pakiety
+  --repositories           Wyświetla skonfigurowane repozytoria
+
+ŚLEDZENIE ZMIAN:
+  --track-changes=DATA     Ustawia datę śledzenia zmian
+                           Przykłady:
+                           --track-changes="1 month ago"
+                           --track-changes="2023-01-15"
+  --config-changes         Wyświetla zmiany w plikach konfiguracyjnych
+  --user-changes           Wyświetla zmiany w użytkownikach i grupach
+  --binary-changes         Wyświetla zmiany w plikach binarnych
+  --scheduled-tasks        Wyświetla zmiany w zaplanowanych zadaniach
+  --network-changes        Wyświetla zmiany w konfiguracji sieci
+  --system-timestamps      Wyświetla zmiany w kluczowych plikach systemowych
+
+RAPORTY MIESIĘCZNE:
+  --monthly-report         Generuje szczegółowy raport miesięczny
+  --monthly-stats          Generuje statystyki miesięczne
+  --monthly-visualize      Generuje wizualizację miesięcznych zmian
+
+PRZYKŁADY UŻYCIA:
+  # Wyświetlenie podstawowych informacji o systemie:
+  sudo ./hello.sh --system-info
+
+  # Wyświetlenie wszystkich informacji z śledzeniem zmian od tygodnia:
+  sudo ./hello.sh --track-changes="1 week ago" --all
+
+  # Wygenerowanie statystyk miesięcznych i zapisanie ich do pliku:
+  sudo ./hello.sh --monthly-stats --save-all
+
+  # Sprawdzenie zmian w plikach konfiguracyjnych od konkretnej daty:
+  sudo ./hello.sh --track-changes="2023-06-01" --config-changes
+
+UWAGI:
+  - Niektóre funkcje wymagają uprawnień roota (sudo).
+  - Aby wyświetlić zmiany, należy użyć opcji --track-changes wraz z odpowiednią datą.
+  - Można łączyć wiele opcji w jednym poleceniu.
+  - Wyniki można zapisać do pliku za pomocą opcji --save-all.
+
+===========================================================
+Instalacja zakończona sukcesem!
+</span>
 </code></pre>
 
         </div>
