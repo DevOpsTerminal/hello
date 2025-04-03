@@ -76,7 +76,7 @@ wget -O install.sh https://raw.githubusercontent.com/DevOpsTerminal/hello/main/i
 
 ##### Bezpośrednie pobranie z domeny DevOps Terminal
 ```bash
-curl -sSL https://hello.devopsterminal.com/install.sh | bash
+curl -sSL https://raw.githubusercontent.com/DevOpsTerminal/hello/main/install.sh | bash
 ```
 
 ##### Ręczne pobieranie i weryfikacja
