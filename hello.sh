@@ -1265,27 +1265,31 @@ main() {
             track_scheduled_tasks
             check_network_changes
             check_system_timestamps
+            exit 0  # Ważne: wyjście po wyświetleniu informacji
         fi
 
-        exit 0
+        # Jeśli dotarliśmy tutaj, to znaczy, że nie obsłużyliśmy wszystkich argumentów
+        echo -e "${RED}Błąd: Nie podano wymaganych argumentów${RESET}"
+        display_help
+        exit 1
     fi
 
-    # Interfejs użytkownika (tylko gdy nie ma argumentów)
+    # Sprawdź, czy skrypt jest uruchomiony jako root - tylko w trybie interaktywnym
+    if [ "$RUN_GUI" = true ] && [ "$(id -u)" != "0" ]; then
+        echo -e "${RED}Uwaga: Skrypt nie jest uruchomiony jako root. Niektóre informacje mogą być niedostępne.${RESET}"
+        echo -e "${YELLOW}Zalecane ponowne uruchomienie z sudo:${RESET} sudo $0\n"
+        read -r -p "Kontynuować mimo to? (t/n): " -n 1 REPLY
+        echo
+        if [[ ! $REPLY =~ ^[Tt]$ ]]; then
+            exit 1
+        fi
+    fi
+
+    # Interfejs użytkownika (tylko gdy nie ma argumentów i RUN_GUI=true)
     if [ "$RUN_GUI" = true ]; then
         echo -e "${BLUE}===== Linux Software Finder =====${RESET}"
         echo -e "${YELLOW}Ten skrypt identyfikuje zainstalowane oprogramowanie i usługi${RESET}"
         echo -e "${YELLOW}oraz śledzi zmiany w systemie od określonej daty${RESET}"
-
-        # Sprawdź, czy skrypt jest uruchomiony jako root
-        if [ "$(id -u)" != "0" ]; then
-            echo -e "${RED}Uwaga: Skrypt nie jest uruchomiony jako root. Niektóre informacje mogą być niedostępne.${RESET}"
-            echo -e "${YELLOW}Zalecane ponowne uruchomienie z sudo:${RESET} sudo $0\n"
-            read -r -p "Kontynuować mimo to? (t/n): " -n 1 REPLY
-            echo
-            if [[ ! $REPLY =~ ^[Tt]$ ]]; then
-                exit 1
-            fi
-        fi
 
         # Menu wyboru
         while true; do
@@ -1459,4 +1463,4 @@ display_help() {
 
 # Uruchom program
 main "$@"
-# Thu Apr  3 12:33:30 PM CEST 2025
+# Thu Apr  3 12:44:58 PM CEST 2025
